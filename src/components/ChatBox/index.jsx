@@ -15,6 +15,11 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#ededed'
         },
     },
+    paper: {
+        margin: "200px 10px",
+        fontSize: 16,
+        color: "#424242"
+    }
 }));
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -24,8 +29,8 @@ export default function ChatBox(props) {
     const classes = useStyles();
 
     const [config, setConfig] = useState({
-        lang: 'en-US',
-        interimResults: false,
+        lang: "cmn-Hant-TW",//'en-US',
+        interimResults: true,
     })
     
     const [text, setText] = useState('');
@@ -66,7 +71,9 @@ export default function ChatBox(props) {
     return (
         <div className={classes.root}>
             <Paper elevation={0}>
-                {text}
+                <div className={classes.paper}>
+                    {text}
+                </div>
                 <ChatBoxBottomAppbar handleOnClick={startSpeechRecognition} />
             </Paper>
         </div>
