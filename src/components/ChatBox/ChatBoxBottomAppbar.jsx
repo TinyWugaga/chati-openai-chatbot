@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -6,11 +6,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
 import Fab from '@material-ui/core/Fab';
-import MenuIcon from '@material-ui/icons/Menu';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import DescriptionIcon from '@material-ui/icons/Description';
 import SpeakerNotesIcon from '@material-ui/icons/SpeakerNotes';
 import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
-import MoreIcon from '@material-ui/icons/MoreVert';
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -81,10 +81,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ChatBoxBottomAppBar(props) {
+function ChatBoxBottomAppBar({
+  handleOnClick,
+  onChangeConfigLang,
+  ...props
+}, ref) {
   const classes = useStyles();
 
-  const handleOnClick = props.handleOnClick;
+  const [inputText, setInputText] = React.useState('');
+  const handleChange = (event) => {
+    setInputText(event.target.value);
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = (lang) => {
+    onChangeConfigLang(lang)
+    setAnchorEl(null);
+  };
 
   return (
     <React.Fragment>
@@ -96,14 +112,6 @@ export default function ChatBoxBottomAppBar(props) {
           <Fab color="secondary" aria-label="add" className={classes.fabButton} onClick={handleOnClick}>
             <SettingsVoiceIcon />
           </Fab>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="open drawer"
-          >
-            <MenuIcon />
-          </IconButton>
           {/**訊息輸入欄 */}
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -116,18 +124,33 @@ export default function ChatBoxBottomAppBar(props) {
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
+              value={inputText}
+              onChange={handleChange}
             />
           </div>
           <div className={classes.grow} />
-          {/**行底功能按鍵區塊 */}
-          <IconButton color="inherit">
+          <IconButton color="inherit"
+            ref={anchorEl}
+            onClick={handleMenuClick}
+          >
             <DescriptionIcon />
           </IconButton>
-          <IconButton edge="end" color="inherit">
-            <MoreIcon />
-          </IconButton>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem onClick={() => handleMenuClose('cmn-Hant-TW')}>Chinese</MenuItem>
+            <MenuItem onClick={() => handleMenuClose('en-US')}>English</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
     </React.Fragment>
   );
 }
+
+export default forwardRef(ChatBoxBottomAppBar)

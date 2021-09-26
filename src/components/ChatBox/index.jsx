@@ -74,7 +74,10 @@ export default function ChatBox(props) {
                 <div className={classes.paper}>
                     {text}
                 </div>
-                <ChatBoxBottomAppbar handleOnClick={startSpeechRecognition} />
+                <ChatBoxBottomAppbar 
+                    handleOnClick={startSpeechRecognition}
+                    onChangeConfigLang={(lang) => setConfig({...config, lang})}
+                />
             </Paper>
         </div>
     );
