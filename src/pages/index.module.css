@@ -36,11 +36,16 @@
   color: #202123;
   margin: 16px 0 40px;
 }
-.main form {
+.main form,
+.main .button_container {
   display: flex;
   flex-direction: column;
   width: 320px;
 }
+.main .button_container {
+  margin: 8px 0px;
+}
+
 .main input[type="text"] {
   padding: 12px 16px;
   border: 1px solid #10a37f;
@@ -61,6 +66,7 @@
   text-align: center;
   cursor: pointer;
 }
+
 .main .result {
   font-weight: bold;
   margin-top: 40px;
