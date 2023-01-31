@@ -11,6 +11,9 @@
       "@/api/*": [
         "src/pages/api/*"
       ],
+      "@/assets/*": [
+        "src/assets/*"
+      ],
       "@/lib/*": [
         "src/lib/*"
       ],

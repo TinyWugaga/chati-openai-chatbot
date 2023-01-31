@@ -6,13 +6,15 @@ import {
   useCallback,
 } from "react";
 
+import { BasicLayout } from "@/components/Layouts";
 import SpeechButton from "@/components/SpeechButton";
+
 import useSpeech from "@/hooks/useSpeech";
 import useAIConversation from "@/hooks/useAIConversation";
+
 import styles from "./index.module.css";
 
 export default function Home() {
-  // const [conversation, setConversation] = useState("");
   const [contentInput, setContentInput] = useState("");
   const [result, setResult] = useState();
 
@@ -43,25 +45,23 @@ export default function Home() {
   }, [currentSpeechText, requestConversation]);
 
   return (
-    <div>
-      <main className={styles.main}>
-        <img src="/dog.png" className={styles.icon} />
-        <h3>Let's Chat</h3>
-        <form onSubmit={onSubmit}>
-          <input
-            type="text"
-            name="content"
-            placeholder="Make Conversation"
-            value={contentInput}
-            onChange={handleInputChange}
-          />
-          <input type="submit" value="Chat!" />
-        </form>
-        <div className={styles.button_container}>
-          <SpeechButton onClick={startSpeech} />
-        </div>
-        <div className={styles.result}>{result}</div>
-      </main>
-    </div>
+    <BasicLayout>
+      <img src="/dog.png" className={styles.icon} />
+      <h3>Let's Chat</h3>
+      <form onSubmit={onSubmit}>
+        <input
+          type="text"
+          name="content"
+          placeholder="Make Conversation"
+          value={contentInput}
+          onChange={handleInputChange}
+        />
+        <input type="submit" value="Chat!" />
+      </form>
+      <div className={styles.button_container}>
+        <SpeechButton onClick={startSpeech} />
+      </div>
+      <div className={styles.result}>{result}</div>
+    </BasicLayout>
   );
 }
