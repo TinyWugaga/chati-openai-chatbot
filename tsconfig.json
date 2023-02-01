@@ -17,12 +17,18 @@
       "@/lib/*": [
         "src/lib/*"
       ],
-      "@/hooks/*": [
-        "src/hooks/*"
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/apps/*": [
+        "src/apps/*"
       ],
       "@/components/*": [
         "src/components/*"
-      ]
+      ],
+      "@/types": [
+        "src/types/index.ts"
+      ],
     },
     "allowJs": true,
     "allowSyntheticDefaultImports": true, // allow import React from 'react';
