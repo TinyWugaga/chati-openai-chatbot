@@ -1,67 +1,78 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import { ChangeEvent, FormEvent, MouseEvent, useEffect } from "react";
 
-import { BasicLayout } from "@/components/Layouts";
+import { ChatBoxProvider, useChatBox } from "@/apps/ChatBox";
+
+import { BasicLayout as Layout } from "@/components/Layouts";
+import {
+  ChatBoxContainer,
+  ChatBoxContent,
+  ChatBoxNavbar,
+  ChatBoxForm,
+  ChatBoxInput,
+} from "@/components/ChatBox";
 import SpeechButton from "@/components/SpeechButton";
 
-import useSpeech from "@/hooks/useSpeech";
-import useAIConversation from "@/hooks/useAIConversation";
-
-import styles from "./index.module.css";
-
 export default function Home() {
-  const [contentInput, setContentInput] = useState("");
-  const [result, setResult] = useState();
+  const {
+    state: {
+      inputValue,
+      currentSpeechText,
+      reply,
 
-  const { currentSpeechText, startSpeech } = useSpeech();
-  const { requestConversation } = useAIConversation();
+      isSpeaking,
+      isProgressing,
+    },
+    actions: {
+      startSpeech,
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setContentInput(e.target.value);
+      handleInputChange,
+      handleSubmit,
+    },
+  } = useChatBox();
+
+  const onStartSpeech = (event: MouseEvent<HTMLButtonElement>) => {
+    console.log("onStartSpeech");
+    startSpeech();
   };
 
-  const requestNewConversation = useCallback(async (content: string) => {
-    const reply = await requestConversation(content);
-    setResult(reply);
-    setContentInput("");
-  }, []);
+  const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(event.target.value);
+  };
 
   async function onSubmit(event: FormEvent | null = null) {
     event && event.preventDefault();
-    if (contentInput.length === 0) return;
-    requestNewConversation(contentInput);
+    handleSubmit();
   }
 
   useEffect(() => {
-    if (contentInput !== currentSpeechText) {
-      setContentInput(currentSpeechText);
-      requestNewConversation(currentSpeechText);
+    if (currentSpeechText.length !== 0) {
+      handleInputChange(currentSpeechText);
+      handleSubmit();
     }
-  }, [currentSpeechText, requestConversation]);
+  }, [currentSpeechText, handleInputChange, handleSubmit]);
 
   return (
-    <BasicLayout>
-      <img src="/dog.png" className={styles.icon} />
-      <h3>Let's Chat</h3>
-      <form onSubmit={onSubmit}>
-        <input
-          type="text"
-          name="content"
-          placeholder="Make Conversation"
-          value={contentInput}
-          onChange={handleInputChange}
-        />
-        <input type="submit" value="Chat!" />
-      </form>
-      <div className={styles.button_container}>
-        <SpeechButton onClick={startSpeech} />
-      </div>
-      <div className={styles.result}>{result}</div>
-    </BasicLayout>
+    <ChatBoxProvider>
+      <Layout>
+        <ChatBoxContainer>
+          <ChatBoxContent>{reply}</ChatBoxContent>
+          <ChatBoxNavbar>
+            <ChatBoxForm onSubmit={onSubmit}>
+              <ChatBoxInput
+                type="text"
+                name="chatbox"
+                placeholder={
+                  isSpeaking ? "Speech listening..." : "Start conversation"
+                }
+                value={inputValue}
+                onChange={onInputChange}
+                disabled={isSpeaking || isProgressing}
+              />
+            </ChatBoxForm>
+            <SpeechButton onClick={onStartSpeech} />
+          </ChatBoxNavbar>
+        </ChatBoxContainer>
+      </Layout>
+    </ChatBoxProvider>
   );
 }
