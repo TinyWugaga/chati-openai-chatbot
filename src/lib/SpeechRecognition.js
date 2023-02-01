@@ -17,7 +17,7 @@ class SpeechRecognition {
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     this._bindEvents();
-    this.init(SpeechRecognition, config);
+    this._init(SpeechRecognition, config);
   }
 
   _bindEvents() {
@@ -25,7 +25,7 @@ class SpeechRecognition {
     this._onSpeechResult = (e) => this._handleSpeechResult(e);
   }
 
-  init(SpeechRecognition, config) {
+  _init(SpeechRecognition, config) {
     this._recognition = new SpeechRecognition();
 
     this._setConfig(config);
@@ -53,16 +53,18 @@ class SpeechRecognition {
   }
 
   _handleSpeechResult(e) {
-    let last = e.results.length - 1;
-    let text = e.results[last][0].transcript;
+    const transcript = Array.from(e.results)
+      .map((result) => result[0])
+      .map((result) => result.transcript)
+      .join("");
 
-    console.log("Text: " + text);
+    console.log("Text: " + transcript);
 
-    this._currentText = text.trim();
+    this._currentText = transcript.trim();
   }
 
   _handleSpeechEnd(handler = null) {
-    if (this.isListening) {
+    if (this._isListening) {
       this._recognition.stop();
 
       this._recognition.removeEventListener("result", this._onSpeechResult);
@@ -80,8 +82,18 @@ class SpeechRecognition {
     this._recognition.removeEventListener("speechstart", this._onSpeechStart);
   }
 
+  initialApp(config = DEFAULT_CONFIG) {
+    if (this._recognition) {
+      this.destroy();
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    this._init(SpeechRecognition, config);
+  }
+
   async start() {
-    if (!this.isListening) {
+    if (!this._isListening) {
       this._recognition.start();
       return new Promise((resolve, reject) => {
         try {
@@ -129,6 +141,10 @@ class SpeechRecognition {
 
   get currentText() {
     return this._currentText;
+  }
+
+  get currentLang() {
+    return this._lang;
   }
 }
 

@@ -1,3 +1,10 @@
+export const backgroundHexColorLighten = (
+  baseColor: string,
+  brightColor: string = "#ffffff"
+): string => {
+  return `linear-gradient(0deg, ${brightColor}20, ${brightColor}20), ${baseColor}`;
+};
+
 export const backgroundHexColorDarken = (
   baseColor: string,
   darkColor: string = "#000000"

@@ -9,7 +9,7 @@ export interface ChatBoxState {
 export interface ChatBoxAction {
   startSpeech: () => void;
   handleInputChange: (value: string) => void;
-  handleSubmit: () => void;
+  handleSubmit: (value: string) => void;
 }
 export interface ChatBoxProviderState {
   state: ChatBoxState;

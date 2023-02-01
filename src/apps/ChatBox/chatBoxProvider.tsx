@@ -5,7 +5,9 @@ import Context from "./context";
 import useSpeech from "./useSpeech";
 import useAIConversation from "./useAIConversation";
 
-export default function ChatBoxProvider({ children }: PropsWithChildren) {
+export default function ChatBoxProvider({
+  children,
+}: PropsWithChildren<unknown>) {
   const [inputValue, setInputValue] = useState("");
   const [reply, setReply] = useState("");
 
@@ -13,9 +15,7 @@ export default function ChatBoxProvider({ children }: PropsWithChildren) {
   const { requestConversation, isProgressing } = useAIConversation();
 
   const requestNewConversation = useCallback(async (content: string) => {
-    const newReply = await requestConversation(content);
-    setReply(newReply);
-    setInputValue("");
+    return await requestConversation(content);
   }, []);
 
   const handleInputChange = useCallback((value: string) => {
@@ -24,10 +24,15 @@ export default function ChatBoxProvider({ children }: PropsWithChildren) {
     setInputValue(value);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    if (inputValue.length === 0) return;
-    requestNewConversation(inputValue);
-  }, [requestNewConversation]);
+  const handleSubmit = useCallback(
+    async (value: string) => {
+      if (value.length === 0) return;
+      const newReply = await requestNewConversation(value);
+      setReply(newReply);
+      setInputValue("");
+    },
+    [requestNewConversation]
+  );
 
   const state = useMemo(
     () => ({
@@ -46,7 +51,16 @@ export default function ChatBoxProvider({ children }: PropsWithChildren) {
         handleSubmit,
       },
     }),
-    []
+    [
+      inputValue,
+      currentSpeechText,
+      reply,
+      isSpeaking,
+      isProgressing,
+      startSpeech,
+      handleInputChange,
+      handleSubmit,
+    ]
   );
 
   return <Context.Provider value={state}>{children}</Context.Provider>;

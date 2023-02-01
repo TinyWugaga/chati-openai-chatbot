@@ -27,6 +27,10 @@ const GlobalStyle = createGlobalStyle`
   input {
     border: unset;
   }
+
+  button {
+    appearance: none;
+  }
 `;
 
 export default GlobalStyle;
