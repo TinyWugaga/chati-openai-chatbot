@@ -1,6 +1,8 @@
 import { MouseEvent } from "react";
 import styled from "styled-components";
 
+import { MicIcon } from "@/components/Icons";
+
 const SpeechButton = styled.button`
   padding: 12px 0;
   color: #fff;
@@ -17,5 +19,9 @@ export default function ({
 }: {
   onClick: (e: MouseEvent<HTMLButtonElement>) => void;
 }) {
-  return <SpeechButton onClick={onClick}>Speak</SpeechButton>;
+  return (
+    <SpeechButton onClick={onClick}>
+      <MicIcon />
+    </SpeechButton>
+  );
 }
