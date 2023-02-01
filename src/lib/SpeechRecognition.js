@@ -17,15 +17,15 @@ class SpeechRecognition {
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     this._bindEvents();
-    this._init(SpeechRecognition, config);
+    this.init(SpeechRecognition, config);
   }
 
   _bindEvents() {
-    this._onHandleSpeechStart = (e) => this._handleSpeechStart(e);
-    this._onHandleSpeechResult = (e) => this._handleSpeechResult(e);
+    this._onSpeechStart = (e) => this._handleSpeechStart(e);
+    this._onSpeechResult = (e) => this._handleSpeechResult(e);
   }
 
-  _init(SpeechRecognition, config) {
+  init(SpeechRecognition, config) {
     this._recognition = new SpeechRecognition();
 
     this._setConfig(config);
@@ -42,14 +42,11 @@ class SpeechRecognition {
   }
 
   _addEventListeners() {
-    this._recognition.addEventListener(
-      "speechstart",
-      this._onHandleSpeechStart
-    );
+    this._recognition.addEventListener("speechstart", this._onSpeechStart);
   }
 
   _handleSpeechStart() {
-    this._recognition.addEventListener("result", this._onHandleSpeechResult);
+    this._recognition.addEventListener("result", this._onSpeechResult);
     this._isListening = true;
 
     console.log("Speech has been detected.");
@@ -59,51 +56,59 @@ class SpeechRecognition {
     let last = e.results.length - 1;
     let text = e.results[last][0].transcript;
 
-    console.log("Confidence: " + e.results[0][0].confidence);
     console.log("Text: " + text);
 
     this._currentText = text.trim();
   }
 
   _handleSpeechEnd(handler = null) {
-    this._recognition.stop();
+    if (this.isListening) {
+      this._recognition.stop();
 
-    this._recognition.removeEventListener("result", this._onHandleSpeechResult);
-    this._isListening = false;
+      this._recognition.removeEventListener("result", this._onSpeechResult);
+      this._isListening = false;
 
-    handler && handler(this._currentText);
+      handler && handler(this._currentText);
+    }
   }
 
   _clearSpeechText() {
     this._currentText = "";
   }
 
-  _unbindEvents() {
-    this._onHandleSpeechStart = null;
-    this._onHandleSpeechResult = null;
-    this._onHandleSpeechEnd = null;
-  }
-
   _removeEventListeners() {
-    this._recognition.removeEventListener(
-      "speechstart",
-      this._onHandleSpeechStart
-    );
+    this._recognition.removeEventListener("speechstart", this._onSpeechStart);
   }
 
   async start() {
-    this._recognition.start();
-    return new Promise((resolve) => {
-      this._recognition.addEventListener(
-        "speechend",
-        () => {
-          this._handleSpeechEnd(resolve);
-        },
-        {
-          once: true,
+    if (!this.isListening) {
+      this._recognition.start();
+      return new Promise((resolve, reject) => {
+        try {
+          this._recognition.addEventListener(
+            "speechend",
+            () => {
+              this._handleSpeechEnd(resolve);
+            },
+            {
+              once: true,
+            }
+          );
+        } catch (error) {
+          reject(error.message);
         }
-      );
-    });
+      });
+    }
+  }
+
+  stop() {
+    const result = this._recognition.stop();
+    this._handleSpeechResult(result);
+
+    this._recognition.removeEventListener("result", this._onSpeechResult);
+    this._isListening = false;
+
+    return this._currentText;
   }
 
   reset() {
@@ -112,14 +117,18 @@ class SpeechRecognition {
   }
 
   destroy() {
-    this._unbindEvents();
     this._removeEventListeners();
+    this._clearSpeechText();
 
     this._recognition = null;
   }
 
   get isListening() {
     return this._isListening;
+  }
+
+  get currentText() {
+    return this._currentText;
   }
 }
 
