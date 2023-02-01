@@ -14,6 +14,6 @@ const Main = styled.main`
   height: 100dvh;
 `;
 
-export default function ({ children }: PropsWithChildren) {
+export default function BasicLayout({ children }: PropsWithChildren) {
   return <Main>{children}</Main>;
 }
