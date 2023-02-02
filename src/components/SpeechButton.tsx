@@ -82,14 +82,15 @@ const Button = styled.button.attrs(({ theme }) => ({
 
   transition: all ease-in-out 0.3s;
 
-  &:hover:not([disabled]) {
-    background: ${({ theme }) =>
-      backgroundHexColorLighten(
-        theme.colors.primary.main,
-        theme.colors.white.main
-      )};
+  @media screen and (hover: hover) {
+    &:hover:not([disabled]) {
+      background: ${({ theme }) =>
+        backgroundHexColorLighten(
+          theme.colors.primary.main,
+          theme.colors.white.main
+        )};
+    }
   }
-
   &[disabled] {
     cursor: auto;
 

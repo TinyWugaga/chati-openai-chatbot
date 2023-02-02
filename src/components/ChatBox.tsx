@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { useChatBox } from "@/apps/ChatBox";
@@ -10,6 +10,7 @@ import SpeechBubble from "@/components/SpeechBubble";
 import { backgroundHexColorDarken } from "@/assets/styles/mixin";
 
 export default function ChatBox() {
+  const ChatBoxContentContainerRef = useRef<HTMLDivElement>(null);
   const {
     state: {
       inputValue,
@@ -47,10 +48,17 @@ export default function ChatBox() {
     }
   }, [currentSpeechText, handleInputChange, handleSubmit]);
 
+  useEffect(() => {
+    const container = ChatBoxContentContainerRef.current;
+    if (container) {
+      container.scrollTo(0, container.scrollHeight);
+    }
+  }, [conversation]);
+
   return (
     <ChatBoxContainer>
       <ChatBoxContent>
-        <ChatBoxContentContainer>
+        <ChatBoxContentContainer ref={ChatBoxContentContainerRef}>
           {conversation?.map(({ author, content }, index) => (
             <SpeechBubble
               key={`conversation_${index}`}
@@ -106,11 +114,13 @@ export const ChatBoxContainer = styled.div`
 
 export const ChatBoxContent = styled.div`
   position: relative;
+  width: 100%;
   height: 100%;
 `;
 
 export const ChatBoxContentContainer = styled.div`
   position: absolute;
+  width: 100%;
   height: 100%;
   overflow-y: scroll;
 

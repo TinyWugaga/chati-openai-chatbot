@@ -20,8 +20,13 @@ const GlobalStyle = createGlobalStyle`
     color: inherit;
     text-decoration: none;
   }
+
   * {
     box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
   }
 
   input {

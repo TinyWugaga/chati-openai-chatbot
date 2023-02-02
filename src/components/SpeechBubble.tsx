@@ -25,7 +25,7 @@ const BubbleContainer = styled.div`
 const Bubble = styled.div<{ direction: string }>`
   position: relative;
   width: fit-content;
-  max-width: 48%;
+  max-width: 78%;
 
   background: #f9f9f9;
   border-radius: ${({ direction }) =>
@@ -33,6 +33,10 @@ const Bubble = styled.div<{ direction: string }>`
   ${({ direction }) =>
     direction === "right" ? "margin-left" : "margin-right"}: auto;
   padding: 0.8rem 1rem;
+
+  @media screen and (min-width: 768px) {
+    max-width: 23rem;
+  }
 `;
 
 const BubbleTextWrapper = styled.p`

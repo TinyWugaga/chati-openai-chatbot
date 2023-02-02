@@ -56,8 +56,10 @@ const Button = styled.button<{ active?: boolean }>`
   background-color: transparent;
   transition: all ease-in-out 0.1s;
 
-  &:hover:not([disabled]) {
-    color: ${({ theme }) => theme.colors.primary.dark + "80"};
+  @media screen and (hover: hover) {
+    &:hover:not([disabled]) {
+      color: ${({ theme }) => theme.colors.primary.dark + "80"};
+    }
   }
 
   &[disabled] {
