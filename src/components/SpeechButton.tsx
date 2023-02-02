@@ -80,7 +80,7 @@ const Button = styled.button.attrs(({ theme }) => ({
   border-radius: 1.5rem;
   text-align: center;
 
-  transition: all ease-in-out 0.5s;
+  transition: all ease-in-out 0.3s;
 
   &:hover:not([disabled]) {
     background: ${({ theme }) =>

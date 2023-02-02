@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useChatBox } from "@/apps/ChatBox";
 
 import SpeechButton from "@/components/SpeechButton";
+import SendButton from "@/components/SendButton";
 import { backgroundHexColorDarken } from "@/assets/styles/mixin";
 
 export default function ChatBox() {
@@ -64,6 +65,13 @@ export default function ChatBox() {
             value={inputValue}
             onChange={onInputChange}
           />
+          <ChatBoxSendButtonWrapper>
+            <SendButton
+              onClick={() => handleSubmit(inputValue)}
+              disabled={isSpeaking || isProgressing}
+              isActive={isProgressing}
+            />
+          </ChatBoxSendButtonWrapper>
         </ChatBoxForm>
         <SpeechButton
           onClick={onStartSpeech}
@@ -111,6 +119,27 @@ export const ChatBoxNavbar = styled.div`
       theme.colors.primary.main,
       theme.colors.primary.dark
     )};
+`;
+
+export const ChatBoxSendButtonWrapper = styled.div`
+  position: absolute;
+  top: 0%;
+  bottom: 0%;
+  right: 1rem;
+  margin: auto 0;
+
+  width: 2rem;
+  height: 2rem;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  button {
+    padding: 0.25rem;
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const ChatBoxForm = styled.form`
