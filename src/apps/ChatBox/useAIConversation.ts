@@ -1,40 +1,50 @@
 import { useState, useCallback } from "react";
 
+interface Conversation {
+  time: Date;
+  author: string;
+  content: string;
+}
+
 export default function useAIConversation() {
-  const [conversation, setConversation] = useState("");
   const [isProgressing, setIsProgressing] = useState(false);
 
-  const generateContent = useCallback(
-    (content: string) =>
-      `${conversation ? conversation + "\n" : ""}user:${content}\nai:`,
-    [conversation]
-  );
+  const generateContent = useCallback((newConversation: Conversation[]) => {
+    // TODO: add sort
+    const content = newConversation
+      .map(({ author, content }) => `${author}:${content}`)
+      .join("\n");
+
+    return `${content ? content + "\n" : ""}ai:`;
+  }, []);
+
+  const fetchGenerateConversationAPI = useCallback((content: string) => {
+    console.log("fetchGenerateConversationAPI:" + content);
+    return fetch("/api/generateConversation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content }),
+    })
+      .then((response) => response.json())
+      .then((response) => response.result)
+      .catch((error) => {
+        throw new Error(
+          `Request failed with status ${error.status}: ${error.message}`
+        );
+      });
+  }, []);
 
   const requestConversation = useCallback(
-    async (newContent: string) => {
+    async (newConversation: Conversation[]) => {
       try {
+        const content = generateContent(newConversation);
+
         setIsProgressing(true);
-        const content = generateContent(newContent);
-        const response = await fetch("/api/generateConversation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content }),
-        });
-        const data = await response.json();
-
-        if (response.status !== 200) {
-          throw (
-            data.error ||
-            new Error(`Request failed with status ${response.status}`)
-          );
-        }
-
-        const reply = data.result;
-        setConversation(`${content}${reply}\n`);
-
+        const reply = await fetchGenerateConversationAPI(content);
         setIsProgressing(false);
+
         return reply;
       } catch (error: any) {
         console.error(error);
@@ -43,12 +53,11 @@ export default function useAIConversation() {
         return "";
       }
     },
-    [generateContent]
+    [generateContent, fetchGenerateConversationAPI]
   );
 
   return {
-    conversation,
-    requestConversation,
     isProgressing,
+    requestConversation,
   };
 }

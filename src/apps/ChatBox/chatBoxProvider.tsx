@@ -5,33 +5,55 @@ import Context from "./context";
 import useSpeech from "./useSpeech";
 import useAIConversation from "./useAIConversation";
 
+import { Conversation } from "@/types";
+
 export default function ChatBoxProvider({
   children,
 }: PropsWithChildren<unknown>) {
   const [inputValue, setInputValue] = useState("");
-  const [reply, setReply] = useState("");
+  const [conversation, setConversation] = useState<Conversation[]>([]);
 
   const { currentSpeechText, startSpeech, isSpeaking } = useSpeech();
   const { requestConversation, isProgressing } = useAIConversation();
 
-  const requestNewConversation = useCallback(async (content: string) => {
-    return await requestConversation(content);
-  }, []);
+  const requestNewReply = useCallback(
+    async (newConversation: Conversation[]) => {
+      const reply = await requestConversation(newConversation);
+      setConversation([
+        ...newConversation,
+        {
+          time: new Date(),
+          author: "ai",
+          content: reply,
+        },
+      ]);
+    },
+    [requestConversation]
+  );
 
   const handleInputChange = useCallback((value: string) => {
-    const newValue = value.trim();
-    if (newValue.length === 0) return;
     setInputValue(value);
   }, []);
 
   const handleSubmit = useCallback(
-    async (value: string) => {
-      if (value.length === 0) return;
-      const newReply = await requestNewConversation(value);
-      setReply(newReply);
+    (value: string) => {
+      const newContent = value.trim();
+      if (newContent.length === 0) return;
+      setConversation((prev) => {
+        const newConversation = [
+          ...prev,
+          {
+            time: new Date(),
+            author: "user",
+            content: newContent,
+          },
+        ];
+        requestNewReply(newConversation);
+        return newConversation;
+      });
       setInputValue("");
     },
-    [requestNewConversation]
+    [requestNewReply]
   );
 
   const state = useMemo(
@@ -39,7 +61,7 @@ export default function ChatBoxProvider({
       state: {
         inputValue,
         currentSpeechText,
-        reply,
+        conversation,
 
         isSpeaking,
         isProgressing,
@@ -54,7 +76,7 @@ export default function ChatBoxProvider({
     [
       inputValue,
       currentSpeechText,
-      reply,
+      conversation,
       isSpeaking,
       isProgressing,
       startSpeech,

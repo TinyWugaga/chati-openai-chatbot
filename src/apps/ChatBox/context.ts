@@ -7,7 +7,7 @@ export default createContext<ChatBoxProviderState>({
   state: {
     inputValue: "",
     currentSpeechText: "",
-    reply: "",
+    conversation: [],
 
     isSpeaking: false,
     isProgressing: false,

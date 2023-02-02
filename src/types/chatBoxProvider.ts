@@ -1,7 +1,13 @@
+export interface Conversation {
+  time: Date;
+  author: string;
+  content: string;
+}
+
 export interface ChatBoxState {
   inputValue: string;
   currentSpeechText: string;
-  reply: string;
+  conversation: Conversation[];
 
   isSpeaking: boolean;
   isProgressing: boolean;

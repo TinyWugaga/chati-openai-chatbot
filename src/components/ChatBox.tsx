@@ -11,7 +11,7 @@ export default function ChatBox() {
     state: {
       inputValue,
       currentSpeechText,
-      reply,
+      conversation,
 
       isSpeaking,
       isProgressing,
@@ -46,7 +46,11 @@ export default function ChatBox() {
 
   return (
     <ChatBoxContainer>
-      <ChatBoxContent>{reply}</ChatBoxContent>
+      <ChatBoxContent>
+        {conversation?.map(({ content }, index) => (
+          <div key={`conversation_${index}`}>{content}</div>
+        ))}
+      </ChatBoxContent>
       <ChatBoxNavbar>
         <ChatBoxForm onSubmit={onSubmit}>
           <ChatBoxInput
@@ -64,6 +68,7 @@ export default function ChatBox() {
         <SpeechButton
           onClick={onStartSpeech}
           disabled={isSpeaking || isProgressing}
+          isActive={isSpeaking}
         />
       </ChatBoxNavbar>
     </ChatBoxContainer>
@@ -75,9 +80,8 @@ export const ChatBoxContainer = styled.div`
   grid-template-rows: 1fr 7.5rem;
 
   position: relative;
-  width: 100%;
+  width: min(100%, 48rem);
   height: 100%;
-  max-width: 48rem;
 
   padding: 0;
 
