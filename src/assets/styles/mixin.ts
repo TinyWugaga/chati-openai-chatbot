@@ -11,3 +11,7 @@ export const backgroundHexColorDarken = (
 ): string => {
   return `linear-gradient(0deg, ${darkColor}20, ${darkColor}20), ${baseColor}`;
 };
+
+export const boxShadowBorder = (color: string): string => {
+  return `1px 0px 0px ${color}, 0px 1px 0px ${color}, -1px 0px 0px ${color}, 0px -1px 0px ${color}`;
+};
