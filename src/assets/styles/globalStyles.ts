@@ -31,6 +31,10 @@ const GlobalStyle = createGlobalStyle`
   button {
     appearance: none;
   }
+
+  p {
+    margin: 0px;
+}
 `;
 
 export default GlobalStyle;

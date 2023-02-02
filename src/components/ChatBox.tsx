@@ -5,6 +5,8 @@ import { useChatBox } from "@/apps/ChatBox";
 
 import SpeechButton from "@/components/SpeechButton";
 import SendButton from "@/components/SendButton";
+import SpeechBubble from "@/components/SpeechBubble";
+
 import { backgroundHexColorDarken } from "@/assets/styles/mixin";
 
 export default function ChatBox() {
@@ -48,9 +50,15 @@ export default function ChatBox() {
   return (
     <ChatBoxContainer>
       <ChatBoxContent>
-        {conversation?.map(({ content }, index) => (
-          <div key={`conversation_${index}`}>{content}</div>
-        ))}
+        <ChatBoxContentContainer>
+          {conversation?.map(({ author, content }, index) => (
+            <SpeechBubble
+              key={`conversation_${index}`}
+              direction={author === "user" ? "right" : "left"}
+              text={content}
+            />
+          ))}
+        </ChatBoxContentContainer>
       </ChatBoxContent>
       <ChatBoxNavbar>
         <ChatBoxForm onSubmit={onSubmit}>
@@ -87,7 +95,7 @@ export const ChatBoxContainer = styled.div`
   display: grid;
   grid-template-rows: 1fr 7.5rem;
 
-  position: relative;
+  position: fixed;
   width: min(100%, 48rem);
   height: 100%;
 
@@ -97,6 +105,15 @@ export const ChatBoxContainer = styled.div`
 `;
 
 export const ChatBoxContent = styled.div`
+  position: relative;
+  height: 100%;
+`;
+
+export const ChatBoxContentContainer = styled.div`
+  position: absolute;
+  height: 100%;
+  overflow-y: scroll;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,7 +142,7 @@ export const ChatBoxSendButtonWrapper = styled.div`
   position: absolute;
   top: 0%;
   bottom: 0%;
-  right: 1rem;
+  right: 0.5rem;
   margin: auto 0;
 
   width: 2rem;
@@ -152,6 +169,7 @@ export const ChatBoxInput = styled.input`
   height: auto;
 
   padding: 1rem;
+  padding-right: 3.2rem;
 
   background: ${({ theme }) => theme.colors.background.paper};
   border-radius: 1.5rem;
