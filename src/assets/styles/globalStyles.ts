@@ -3,17 +3,13 @@ import { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
   html,
   body {
-    color: ${({ theme }) => theme.colors.primary.text};
-
     padding: 0;
     margin: 0;
 
     font-family: Poppins, Noto Sans TC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
       Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  }
-  a {
-    color: inherit;
-    text-decoration: none;
+
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   * {
@@ -22,6 +18,11 @@ const GlobalStyle = createGlobalStyle`
     &::-webkit-scrollbar {
       width: 0;
     }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 
   input {
