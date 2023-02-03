@@ -1,11 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-import fonts from "./fonts";
-
 const GlobalStyle = createGlobalStyle`
-
-  ${fonts}
-
   html,
   body {
     color: ${({ theme }) => theme.colors.primary.text};
@@ -13,7 +8,7 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     margin: 0;
 
-    font-family: "ColfaxAI", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    font-family: Poppins, Noto Sans TC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
       Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   }
   a {
@@ -39,7 +34,7 @@ const GlobalStyle = createGlobalStyle`
 
   p {
     margin: 0px;
-}
+  }
 `;
 
 export default GlobalStyle;

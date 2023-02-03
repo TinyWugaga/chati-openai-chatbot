@@ -1,20 +1,13 @@
-import { css } from "styled-components";
-
-export default css`
-  @font-face {
-    font-family: "ColfaxAI";
-    src: url(https://cdn.openai.com/API/fonts/ColfaxAIRegular.woff2)
-        format("woff2"),
-      url(https://cdn.openai.com/API/fonts/ColfaxAIRegular.woff) format("woff");
-    font-weight: normal;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "ColfaxAI";
-    src: url(https://cdn.openai.com/API/fonts/ColfaxAIBold.woff2)
-        format("woff2"),
-      url(https://cdn.openai.com/API/fonts/ColfaxAIBold.woff) format("woff");
-    font-weight: bold;
-    font-style: normal;
-  }
-`;
+export const googleFontLinks = [
+  {
+    family: "Itim",
+  },
+  {
+    family: "Noto+Sans+TC",
+    wght: ["100", "400", "700"],
+  },
+  {
+    family: "Poppins",
+    wght: ["100", "400", "700"],
+  },
+];
