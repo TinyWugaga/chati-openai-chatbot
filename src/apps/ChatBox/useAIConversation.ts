@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 
+import logger from "@/lib/logger";
+
 interface Conversation {
   time: Date;
   author: string;
@@ -19,7 +21,7 @@ export default function useAIConversation() {
   }, []);
 
   const fetchGenerateConversationAPI = useCallback((content: string) => {
-    console.log("fetchGenerateConversationAPI:" + content);
+    logger.log("fetchGenerateConversationAPI:" + content);
     return fetch("/api/generateConversation", {
       method: "POST",
       headers: {
@@ -47,7 +49,7 @@ export default function useAIConversation() {
 
         return reply;
       } catch (error: any) {
-        console.error(error);
+        logger.error(error);
 
         setIsProgressing(false);
         return "";

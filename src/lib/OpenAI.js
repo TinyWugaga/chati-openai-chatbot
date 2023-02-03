@@ -1,6 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 
 import { ErrorTypes } from "@/lib/constants";
+import logger from "@/lib/logger";
 
 class OpenAI {
   _openAI;
@@ -36,7 +37,7 @@ class OpenAI {
       });
 
       const choices = completion.data.choices;
-      console.log({ choices });
+      logger.log({ choices });
 
       const result = choices[0].text;
       return result;

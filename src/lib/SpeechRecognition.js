@@ -1,3 +1,5 @@
+import logger from "@/lib/logger";
+
 const DEFAULT_CONFIG = {
   lang: "en-US",
   interimResults: true, // If true return result instantly
@@ -49,7 +51,7 @@ class SpeechRecognition {
     this._recognition.addEventListener("result", this._onSpeechResult);
     this._isListening = true;
 
-    console.log("Speech has been detected.");
+    logger.log("Speech has been detected.");
   }
 
   _handleSpeechResult(e) {
@@ -58,7 +60,7 @@ class SpeechRecognition {
       .map((result) => result.transcript)
       .join("");
 
-    console.log("Text: " + transcript);
+    logger.log("Text: " + transcript);
 
     this._currentText = transcript.trim();
   }
@@ -93,7 +95,7 @@ class SpeechRecognition {
   }
 
   async start() {
-    if (!this._isListening) {
+    if (this._recognition && !this._isListening) {
       this._recognition.start();
       return new Promise((resolve, reject) => {
         try {
@@ -111,6 +113,7 @@ class SpeechRecognition {
         }
       });
     }
+    return "";
   }
 
   stop() {
