@@ -22,7 +22,7 @@ export default function SpeechBubble({
 
 const BubbleBounceKeyframe = keyframes`
   0% {
-    transform: scale(0.9, 0);
+    transform: scale(0.98, 0);
   }
   70% {
     transform: scale(1, 1.2);
@@ -38,10 +38,13 @@ const BubbleKeyframe = keyframes`
   }
 
   55% {
-    transform: translateY(-10%);
+    transform: translateY(-8%);
   }
 
   70% {
+    transform: translateY(-10%);
+  }
+  100% {
     transform: translateY(0px);
   }
 `;
@@ -76,6 +79,8 @@ const Bubble = styled.div<{ direction: string }>`
   max-width: 23rem;
 
   background: #f9f9f9;
+  box-shadow: 0px 4px 2px rgba(72, 77, 81, 0.12);
+
   border-radius: ${({ direction }) =>
     direction === "right" ? "12px 12px 0px 12px" : "12px 12px 12px 0px"};
   ${({ direction }) =>

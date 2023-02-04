@@ -4,7 +4,6 @@ import { MicIcon } from "@/components/Icons";
 import {
   backgroundHexColorDarken,
   backgroundHexColorLighten,
-  boxShadowBorder,
 } from "@/assets/styles/mixin";
 
 export default function SpeechButton({
@@ -98,7 +97,7 @@ const Button = styled.button.attrs(({ theme }) => ({
       active
         ? ButtonActiveAnimation
         : `color: ${theme.colors.black.main + "30"};
-          box-shadow: ${boxShadowBorder(theme.colors.black.main + "26")};
+           background: ${theme.colors.black.main + "08"};
       `}
   }
 `;
