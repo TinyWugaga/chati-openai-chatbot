@@ -5,7 +5,7 @@ import Context from "./context";
 import useSpeech from "./useSpeech";
 import useAIConversation from "./useAIConversation";
 
-import { Conversation } from "@/types";
+import { ConversationRequestStatus, Conversation } from "@/types";
 
 export default function ChatBoxProvider({
   children,
@@ -19,12 +19,25 @@ export default function ChatBoxProvider({
   const requestNewReply = useCallback(
     async (newConversation: Conversation[]) => {
       const reply = await requestConversation(newConversation);
+      if (newConversation.length > 0) {
+        const lastConversation = newConversation.pop();
+        newConversation.push({
+          ...(lastConversation as Conversation),
+          status: reply
+            ? ConversationRequestStatus.SUCCESS
+            : ConversationRequestStatus.ERROR,
+        });
+      }
       setConversation([
         ...newConversation,
         {
+          id: newConversation.length + 1,
           time: new Date(),
           author: "ai",
           content: reply,
+          status: reply
+            ? ConversationRequestStatus.SUCCESS
+            : ConversationRequestStatus.ERROR,
         },
       ]);
     },
@@ -43,9 +56,11 @@ export default function ChatBoxProvider({
         const newConversation = [
           ...prev,
           {
+            id: prev.length + 1,
             time: new Date(),
             author: "user",
             content: newContent,
+            status: ConversationRequestStatus.PROGRESSING,
           },
         ];
         requestNewReply(newConversation);

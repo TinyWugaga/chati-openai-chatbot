@@ -1,7 +1,15 @@
+export enum ConversationRequestStatus {
+  PROGRESSING = "progressing",
+  SUCCESS = "success",
+  ERROR = "error",
+}
+
 export interface Conversation {
+  id: number;
   time: Date;
   author: string;
   content: string;
+  status: ConversationRequestStatus;
 }
 
 export interface ChatBoxState {
