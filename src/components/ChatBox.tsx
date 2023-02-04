@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useRef } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { useChatBox } from "@/apps/ChatBox";
@@ -10,6 +10,7 @@ import SpeechBubble from "@/components/SpeechBubble";
 import { backgroundHexColorDarken } from "@/assets/styles/mixin";
 
 export default function ChatBox() {
+  const [isLoading, setIsLoading] = useState(false);
   const ChatBoxContentContainerRef = useRef<HTMLDivElement>(null);
   const {
     state: {
@@ -41,6 +42,7 @@ export default function ChatBox() {
     handleSubmit(inputValue);
   }
 
+  // Auto send request if speech text recognized
   useEffect(() => {
     if (currentSpeechText.length !== 0) {
       handleInputChange(currentSpeechText);
@@ -48,12 +50,28 @@ export default function ChatBox() {
     }
   }, [currentSpeechText, handleInputChange, handleSubmit]);
 
+  // Scroll to the latest chat bubble if conversation increase
   useEffect(() => {
-    const container = ChatBoxContentContainerRef.current;
-    if (container) {
-      container.scrollTo(0, container.scrollHeight);
+    const scrollToBottom = () => {
+      const container = ChatBoxContentContainerRef.current;
+      if (container) {
+        container.scrollTo(0, container.scrollHeight);
+      }
+    };
+    if (isLoading || conversation.length > 0) {
+      scrollToBottom();
     }
-  }, [conversation]);
+  }, [isLoading, conversation]);
+
+  useEffect(() => {
+    if (isProgressing) {
+      setTimeout(() => {
+        if (isProgressing) setIsLoading(true);
+      }, 1000);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isProgressing]);
 
   return (
     <ChatBoxContainer>
@@ -66,6 +84,14 @@ export default function ChatBox() {
               text={content}
             />
           ))}
+          {isLoading && (
+            <SpeechBubble
+              key={`conversation_${conversation.length}`}
+              direction="left"
+              text={""}
+              isLoading
+            />
+          )}
         </ChatBoxContentContainer>
       </ChatBoxContent>
       <ChatBoxNavbar>

@@ -1,18 +1,20 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 
 import { mediaQueryScreen } from "@/assets/styles/mixin";
 
 export default function SpeechBubble({
   text,
   direction = "right",
+  isLoading = false,
 }: {
   text: string;
   direction?: string;
+  isLoading?: boolean;
 }) {
   return (
     <BubbleContainer>
       <Bubble direction={direction}>
-        <BubbleTextWrapper>{text}</BubbleTextWrapper>
+        <BubbleTextWrapper isLoading={isLoading}>{text}</BubbleTextWrapper>
       </Bubble>
     </BubbleContainer>
   );
@@ -44,12 +46,26 @@ const BubbleKeyframe = keyframes`
   }
 `;
 
+const LoadingKeyframe = keyframes`
+  0% {
+    width: 0;
+    margin-right: 100%;
+  }
+
+  100% {
+    width: 100%;
+    margin-right: 0;
+  }
+`;
+
 const BubbleContainer = styled.div`
   position: relative;
   width: 100%;
   height: auto;
 
-  animation: 0.38s ease-out 0s 1 normal forwards running ${BubbleBounceKeyframe};
+  transform: scale(0);
+  animation: 0.38s ease-out 500ms 1 normal forwards running
+    ${BubbleBounceKeyframe};
   transform-box: fill-box;
   transform-origin: 50% 50%;
 `;
@@ -70,11 +86,29 @@ const Bubble = styled.div<{ direction: string }>`
     max-width: 78%;
   }
 
-  animation: 0.38s ease-out 0s 1 normal backwards running ${BubbleKeyframe};
+  animation: 0.38s ease-out 500ms 1 normal backwards running ${BubbleKeyframe};
   transform-box: fill-box;
   transform-origin: 50% 50%;
 `;
 
-const BubbleTextWrapper = styled.p`
+const LoadingCSS = css`
+  &:before {
+    content: "......";
+    display: inline-block;
+    overflow-x: hidden;
+
+    width: 0;
+    margin-right: 100%;
+
+    letter-spacing: 2px;
+
+    animation: 1.2s linear 500ms infinite normal forwards running
+      ${LoadingKeyframe};
+  }
+`;
+
+const BubbleTextWrapper = styled.p<{ isLoading: boolean }>`
   font-size: 1rem;
+
+  ${({ isLoading }) => (isLoading ? LoadingCSS : "")};
 `;
