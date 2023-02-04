@@ -10,6 +10,9 @@ class SpeechRecognition {
   _recognition;
   _currentText = "";
 
+  // For safari which can not trigger the `speechend` event itself
+  _speakingTimeCount = 0;
+
   // status
   _isListening = false;
 
@@ -46,9 +49,6 @@ class SpeechRecognition {
 
   _addEventListeners() {
     this._recognition.addEventListener("audiostart", this._onAudioStart);
-    this._recognition.addEventListener("audioend", () => {
-      console.log("audioend");
-    });
   }
 
   _handleAudioStart() {
@@ -71,6 +71,7 @@ class SpeechRecognition {
     logger.log("Text: " + transcript);
 
     this._currentText = transcript.trim();
+    this._speakingTimeCount = 0;
   }
 
   _handleSpeechEnd(handler = null) {
@@ -112,9 +113,21 @@ class SpeechRecognition {
             console.log("end:" + e);
             this._handleSpeechEnd(resolve);
 
+            clearInterval(speakingTimer);
             this._recognition.removeEventListener("speechend", onEnded);
             this._recognition.removeEventListener("end", onEnded);
           };
+
+          const speakingTimer = setInterval(() => {
+            if (this._isListening) {
+              this._speakingTimeCount += 1;
+            }
+            if (this._speakingTimeCount === 4) {
+              this._speakingTimeCount = 0;
+              onEnded();
+            }
+            console.log({ count: this._speakingTimeCount });
+          }, 1000);
 
           this._recognition.addEventListener("speechend", onEnded);
           this._recognition.addEventListener("end", onEnded);
