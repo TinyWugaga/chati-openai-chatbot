@@ -15,14 +15,20 @@ export default function useSpeech() {
     };
   }, []);
 
+  const stopSpeech = useCallback(async (text = "") => {
+    if (speechRecognition.current) {
+      setCurrentSpeechText(text);
+      setIsSpeaking(false);
+    }
+  }, []);
+
   const startSpeech = useCallback(async () => {
     if (speechRecognition.current) {
       setIsSpeaking(true);
       const speechText = await speechRecognition.current.start();
-      setCurrentSpeechText(speechText);
-      setIsSpeaking(false);
+      stopSpeech(speechText);
     }
-  }, []);
+  }, [stopSpeech]);
 
   return {
     currentSpeechText,

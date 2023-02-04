@@ -23,6 +23,7 @@ class SpeechRecognition {
   }
 
   _bindEvents() {
+    this._onAudioStart = (e) => this._handleAudioStart(e);
     this._onSpeechStart = (e) => this._handleSpeechStart(e);
     this._onSpeechResult = (e) => this._handleSpeechResult(e);
   }
@@ -44,13 +45,20 @@ class SpeechRecognition {
   }
 
   _addEventListeners() {
+    this._recognition.addEventListener("audiostart", this._onAudioStart);
+    this._recognition.addEventListener("audioend", () => {
+      console.log("audioend");
+    });
+  }
+
+  _handleAudioStart() {
+    this._isListening = true;
     this._recognition.addEventListener("speechstart", this._onSpeechStart);
+    logger.log("Start recording audio.");
   }
 
   _handleSpeechStart() {
     this._recognition.addEventListener("result", this._onSpeechResult);
-    this._isListening = true;
-
     logger.log("Speech has been detected.");
   }
 
@@ -68,12 +76,11 @@ class SpeechRecognition {
   _handleSpeechEnd(handler = null) {
     if (this._isListening) {
       this._recognition.stop();
-
-      this._recognition.removeEventListener("result", this._onSpeechResult);
       this._isListening = false;
-
-      handler && handler(this._currentText);
     }
+    this._recognition.removeEventListener("speechstart", this._onSpeechStart);
+    this._recognition.removeEventListener("result", this._onSpeechResult);
+    handler && handler(this._currentText);
   }
 
   _clearSpeechText() {
@@ -81,7 +88,9 @@ class SpeechRecognition {
   }
 
   _removeEventListeners() {
+    this._recognition.removeEventListener("audiostart", this._onAudioStart);
     this._recognition.removeEventListener("speechstart", this._onSpeechStart);
+    this._recognition.removeEventListener("result", this._onSpeechResult);
   }
 
   initialApp(config = DEFAULT_CONFIG) {
@@ -99,15 +108,16 @@ class SpeechRecognition {
       this._recognition.start();
       return new Promise((resolve, reject) => {
         try {
-          this._recognition.addEventListener(
-            "speechend",
-            () => {
-              this._handleSpeechEnd(resolve);
-            },
-            {
-              once: true,
-            }
-          );
+          const onEnded = (e) => {
+            console.log("end:" + e);
+            this._handleSpeechEnd(resolve);
+
+            this._recognition.removeEventListener("speechend", onEnded);
+            this._recognition.removeEventListener("end", onEnded);
+          };
+
+          this._recognition.addEventListener("speechend", onEnded);
+          this._recognition.addEventListener("end", onEnded);
         } catch (error) {
           reject(error.message);
         }
