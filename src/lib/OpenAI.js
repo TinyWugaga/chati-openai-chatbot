@@ -3,6 +3,8 @@ import { Configuration, OpenAIApi } from "openai";
 import { ErrorTypes } from "@/lib/constants";
 import logger from "@/lib/logger";
 
+import { isUTF8 } from "@/utils/isUTF8";
+
 class OpenAI {
   _openAI;
 
@@ -31,8 +33,11 @@ class OpenAI {
       const completion = await this._openAI.createCompletion({
         model: "text-davinci-003",
         temperature: 0.5,
-        max_tokens: 60,
-        stop: ["user:", "ai:"],
+        max_tokens: 100 * (isUTF8(content) ? 3 : 1),
+        top_p: 1.0,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.0,
+        stop: ["user:"],
         prompt: content,
       });
 
