@@ -20,6 +20,7 @@ export default function ChatBox() {
 
       isSpeaking,
       isProgressing,
+      isSupportSpeech,
     },
     actions: {
       startSpeech,
@@ -115,11 +116,13 @@ export default function ChatBox() {
             />
           </ChatBoxSendButtonWrapper>
         </ChatBoxForm>
-        <SpeechButton
-          onClick={onStartSpeech}
-          disabled={isSpeaking || isProgressing}
-          isActive={isSpeaking}
-        />
+        {isSupportSpeech && (
+          <SpeechButton
+            onClick={onStartSpeech}
+            disabled={isSpeaking || isProgressing}
+            isActive={isSpeaking}
+          />
+        )}
       </ChatBoxNavbar>
     </ChatBoxContainer>
   );

@@ -13,7 +13,8 @@ export default function ChatBoxProvider({
   const [inputValue, setInputValue] = useState("");
   const [conversation, setConversation] = useState<Conversation[]>([]);
 
-  const { currentSpeechText, startSpeech, isSpeaking } = useSpeech();
+  const { currentSpeechText, startSpeech, isSpeaking, isSupportSpeech } =
+    useSpeech();
   const { requestConversation, isProgressing } = useAIConversation();
 
   const requestNewReply = useCallback(
@@ -80,6 +81,7 @@ export default function ChatBoxProvider({
 
         isSpeaking,
         isProgressing,
+        isSupportSpeech,
       },
       actions: {
         startSpeech,
@@ -94,6 +96,8 @@ export default function ChatBoxProvider({
       conversation,
       isSpeaking,
       isProgressing,
+      isSupportSpeech,
+
       startSpeech,
       handleInputChange,
       handleSubmit,

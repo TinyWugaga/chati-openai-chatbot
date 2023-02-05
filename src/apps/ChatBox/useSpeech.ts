@@ -1,15 +1,22 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 import SpeechRecognition from "@/lib/SpeechRecognition";
+import logger from "@/lib/logger";
 
 export default function useSpeech() {
   const [currentSpeechText, setCurrentSpeechText] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSupportSpeech, setIsSupportSpeech] = useState(false);
 
   const speechRecognition = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
-    speechRecognition.current = new SpeechRecognition();
+    try {
+      speechRecognition.current = new SpeechRecognition();
+      setIsSupportSpeech(true);
+    } catch (error) {
+      logger.error(error);
+    }
     return () => {
       speechRecognition.current?.destroy();
     };
@@ -34,5 +41,6 @@ export default function useSpeech() {
     currentSpeechText,
     startSpeech,
     isSpeaking,
+    isSupportSpeech,
   };
 }

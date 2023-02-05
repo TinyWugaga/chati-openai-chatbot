@@ -21,6 +21,10 @@ class SpeechRecognition {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    if (SpeechRecognition === undefined) {
+      throw new Error("Can not detect the SpeechRecognition API");
+    }
+
     this._bindEvents();
     this._init(SpeechRecognition, config);
   }
@@ -109,8 +113,7 @@ class SpeechRecognition {
       this._recognition.start();
       return new Promise((resolve, reject) => {
         try {
-          const onEnded = (e) => {
-            console.log("end:" + e);
+          const onEnded = () => {
             this._handleSpeechEnd(resolve);
 
             clearInterval(speakingTimer);
@@ -126,7 +129,6 @@ class SpeechRecognition {
               this._speakingTimeCount = 0;
               onEnded();
             }
-            console.log({ count: this._speakingTimeCount });
           }, 1000);
 
           this._recognition.addEventListener("speechend", onEnded);

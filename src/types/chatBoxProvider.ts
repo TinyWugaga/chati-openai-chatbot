@@ -19,6 +19,7 @@ export interface ChatBoxState {
 
   isSpeaking: boolean;
   isProgressing: boolean;
+  isSupportSpeech: boolean;
 }
 export interface ChatBoxAction {
   startSpeech: () => void;
