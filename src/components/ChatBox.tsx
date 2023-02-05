@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { useChatBox } from "@/apps/ChatBox";
@@ -10,8 +10,8 @@ import SpeechBubble from "@/components/SpeechBubble";
 import { backgroundHexColorDarken } from "@/assets/styles/mixin";
 
 export default function ChatBox() {
-  const [isLoading, setIsLoading] = useState(false);
   const ChatBoxContentContainerRef = useRef<HTMLDivElement>(null);
+
   const {
     state: {
       inputValue,
@@ -21,6 +21,8 @@ export default function ChatBox() {
       isSpeaking,
       isProgressing,
       isSupportSpeech,
+
+      loadingTime,
     },
     actions: {
       startSpeech,
@@ -51,43 +53,21 @@ export default function ChatBox() {
     }
   }, [currentSpeechText, handleInputChange, handleSubmit]);
 
-  // Scroll to the latest chat bubble if conversation increase
-  useEffect(() => {
-    const scrollToBottom = () => {
-      const container = ChatBoxContentContainerRef.current;
-      if (container) {
-        container.scrollTo(0, container.scrollHeight);
-      }
-    };
-    if (isLoading || conversation.length > 0) {
-      scrollToBottom();
-    }
-  }, [isLoading, conversation]);
-
-  useEffect(() => {
-    if (isProgressing) {
-      setTimeout(() => {
-        if (isProgressing) setIsLoading(true);
-      }, 1000);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isProgressing]);
-
   return (
     <ChatBoxContainer>
       <ChatBoxContent>
         <ChatBoxContentContainer ref={ChatBoxContentContainerRef}>
-          {conversation?.map(({ author, content }, index) => (
+          {conversation?.map(({ id, author, content }) => (
             <SpeechBubble
-              key={`conversation_${index}`}
+              key={`conversation_${id}`}
+              container={ChatBoxContentContainerRef.current}
               direction={author === "user" ? "right" : "left"}
               text={content}
             />
           ))}
-          {isLoading && (
+          {loadingTime >= 1 && (
             <SpeechBubble
-              key={`conversation_${conversation.length}`}
+              container={ChatBoxContentContainerRef.current}
               direction="left"
               text={""}
               isLoading

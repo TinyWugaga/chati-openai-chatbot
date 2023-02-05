@@ -1,38 +1,90 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import OpenAI from "@/lib/OpenAI";
-import { ErrorTypes } from "@/lib/constants";
+import logger from "@/lib/logger";
+
+import { CHATTING_AI_PROMPT } from "@/utils/constant";
+
+import {
+  Conversation,
+  ConversationAPIError,
+  GenerateConversationAPIErrorType,
+} from "@/types";
+
+const validateContent = (content: string) => {
+  const isInvalid = content.trim().length === 0 || content.match(/sex/i);
+  return !isInvalid;
+};
+
+const generateContent = (newConversation: Conversation[]) => {
+  // TODO: add sort
+  const content = newConversation
+    .filter(({ author }) => ["user", "ai"].includes(author))
+    .map(({ author, content }) => `${author}:${content}`)
+    .join("\n");
+
+  return `${CHATTING_AI_PROMPT}\n${content ? content + "\n" : ""}ai:`;
+};
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const openai = new OpenAI();
-  const content = req.body.content || "";
+  const conversations = (req.body.conversations || []) as Conversation[];
+  const requestConversation = conversations.pop();
+
+  const handleError = (
+    error: ConversationAPIError,
+    conversation: Conversation | {}
+  ) => {
+    logger.error({
+      generateConversationAPIError: { conversation, error },
+    });
+
+    res.status(error.status).json({ conversation, error });
+  };
 
   try {
-    const result = await openai.createConversation(content);
-    res.status(200).json({ result });
-  } catch (error: any) {
-    // Consider adjusting the error handling logic for your use case
-    const errorResponse = error.response;
-    const errorName = error.name;
-    if (errorResponse) {
-      console.error(errorResponse.status, errorResponse.data);
-      res.status(errorResponse.status).json(errorResponse.data);
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-
-      if (errorName === ErrorTypes.INVALID_INPUT_ERROR) {
-        res.status(400).json({
-          error: {
-            message: `"${content}" is a invalid content.`,
-          },
-        });
-        return;
-      }
-      res.status(500).json({
-        error: {
-          message: `An ${error.name} occurred during your request.`,
+    if (
+      requestConversation === undefined ||
+      !validateContent(requestConversation.content)
+    ) {
+      handleError(
+        {
+          name: GenerateConversationAPIErrorType.INVALID_CONTENT_ERROR,
+          message: "Invalid content.",
+          status: 400,
         },
-      });
+        { ...requestConversation }
+      );
+      return;
+    }
+
+    const content = generateContent([
+      ...conversations,
+      { ...requestConversation },
+    ]);
+    const result = await openai.createConversation(content);
+
+    res.status(200).json({ conversation: requestConversation, result });
+  } catch (error: any) {
+    const errorResponse = error.response;
+    if (errorResponse) {
+      handleError(
+        {
+          ...errorResponse.data,
+          name: GenerateConversationAPIErrorType.RESPONSE_ERROR,
+          status: errorResponse.status,
+        },
+        { ...requestConversation }
+      );
+    } else {
+      handleError(
+        {
+          name: GenerateConversationAPIErrorType.REQUEST_OPEN_AI_ERROR,
+          message: `An ${error.name} occurred during your request.`,
+          status: 500,
+        },
+        { ...requestConversation }
+      );
     }
   }
 }

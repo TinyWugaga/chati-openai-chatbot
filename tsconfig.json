@@ -52,10 +52,11 @@
   "include": [
     "next-env.d.ts",
     "src/global.d.ts",
+    "src/lib/OpenAI.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

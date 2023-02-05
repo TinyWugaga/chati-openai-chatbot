@@ -1,65 +1,77 @@
 import { useState, useCallback } from "react";
 
 import logger from "@/lib/logger";
-
-interface Conversation {
-  time: Date;
-  author: string;
-  content: string;
-}
+import {
+  Conversation,
+  GenerateConversationAPIResult,
+  GenerateConversationAPIError,
+} from "@/types";
 
 export default function useAIConversation() {
   const [isProgressing, setIsProgressing] = useState(false);
+  const [loadingTime, setLoadingTime] = useState(0);
 
-  const generateContent = useCallback((newConversation: Conversation[]) => {
-    // TODO: add sort
-    const content = newConversation
-      .map(({ author, content }) => `${author}:${content}`)
-      .join("\n");
+  const fetchGenerateConversationAPI = useCallback(
+    async (
+      conversations: Conversation[]
+    ): Promise<
+      GenerateConversationAPIResult | GenerateConversationAPIError
+    > => {
+      let stopTimer = false;
+      logger.log({ fetchGenerateConversationAPI: conversations });
 
-    return `${content ? content + "\n" : ""}ai:`;
-  }, []);
+      const loadingTimeInterval = setInterval(() => {
+        if (!stopTimer) {
+          setLoadingTime((time) => time + 1);
+        } else {
+          clearInterval(loadingTimeInterval);
+        }
+      }, 500);
 
-  const fetchGenerateConversationAPI = useCallback((content: string) => {
-    logger.log("fetchGenerateConversationAPI:" + content);
-    return fetch("/api/generateConversation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content }),
-    })
-      .then((response) => response.json())
-      .then((response) => response.result)
-      .catch((error) => {
-        throw new Error(
-          `Request failed with status ${error.status}: ${error.message}`
-        );
-      });
-  }, []);
+      const result = await fetch("/api/generateConversation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conversations }),
+      })
+        .then((response) => response.json())
+        .catch((error) => error);
+
+      if (result) {
+        stopTimer = true;
+        setLoadingTime(0);
+      }
+      return result;
+    },
+    []
+  );
 
   const requestConversation = useCallback(
-    async (newConversation: Conversation[]) => {
+    async (newConversations: Conversation[]) => {
       try {
-        const content = generateContent(newConversation);
-
         setIsProgressing(true);
-        const reply = await fetchGenerateConversationAPI(content);
+        const response = await fetchGenerateConversationAPI(newConversations);
         setIsProgressing(false);
 
-        return reply;
+        return {
+          error: undefined,
+          result: "",
+          ...response,
+        };
       } catch (error: any) {
-        logger.error(error);
-
+        logger.error({ requestConversationError: error });
         setIsProgressing(false);
-        return "";
+
+        throw error;
       }
     },
-    [generateContent, fetchGenerateConversationAPI]
+    [fetchGenerateConversationAPI]
   );
 
   return {
     isProgressing,
+    loadingTime,
     requestConversation,
   };
 }

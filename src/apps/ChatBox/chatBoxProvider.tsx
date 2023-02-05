@@ -1,11 +1,23 @@
-import { useState, useMemo, useCallback, PropsWithChildren } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  PropsWithChildren,
+} from "react";
+
+import { ConversationRequestStatus, Conversation } from "@/types";
+import logger from "@/lib/logger";
 
 import Context from "./context";
 
 import useSpeech from "./useSpeech";
 import useAIConversation from "./useAIConversation";
 
-import { ConversationRequestStatus, Conversation } from "@/types";
+import {
+  generateConversationId,
+  updateConversationPropertyById,
+} from "./utils";
 
 export default function ChatBoxProvider({
   children,
@@ -15,32 +27,49 @@ export default function ChatBoxProvider({
 
   const { currentSpeechText, startSpeech, isSpeaking, isSupportSpeech } =
     useSpeech();
-  const { requestConversation, isProgressing } = useAIConversation();
+  const { requestConversation, isProgressing, loadingTime } =
+    useAIConversation();
 
-  const requestNewReply = useCallback(
+  const requestNewConversation = useCallback(
     async (newConversation: Conversation[]) => {
-      const reply = await requestConversation(newConversation);
-      if (newConversation.length > 0) {
-        const lastConversation = newConversation.pop();
-        newConversation.push({
-          ...(lastConversation as Conversation),
-          status: reply
-            ? ConversationRequestStatus.SUCCESS
-            : ConversationRequestStatus.ERROR,
+      if (newConversation.length === 0) return;
+      try {
+        const reply = await requestConversation([...newConversation]);
+        const { result, error, conversation } = reply;
+
+        updateConversationPropertyById(newConversation, conversation.id, {
+          status: ConversationRequestStatus.FINISHED,
         });
+
+        if (result) {
+          setConversation([
+            ...newConversation,
+            {
+              id: generateConversationId("ai"),
+              time: new Date(),
+              author: "ai",
+              content: result,
+              status: ConversationRequestStatus.SUCCESS,
+            },
+          ]);
+        }
+        if (error) {
+          setConversation([
+            ...newConversation,
+            {
+              id: generateConversationId("system"),
+              time: new Date(),
+              author: "system",
+              content: error.message,
+              status: ConversationRequestStatus.ERROR,
+            },
+          ]);
+        }
+      } catch (error: any) {
+        logger.error({ requestNewConversation: error });
+        newConversation.pop();
+        setConversation([...newConversation]);
       }
-      setConversation([
-        ...newConversation,
-        {
-          id: newConversation.length + 1,
-          time: new Date(),
-          author: "ai",
-          content: reply,
-          status: reply
-            ? ConversationRequestStatus.SUCCESS
-            : ConversationRequestStatus.ERROR,
-        },
-      ]);
     },
     [requestConversation]
   );
@@ -53,24 +82,30 @@ export default function ChatBoxProvider({
     (value: string) => {
       const newContent = value.trim();
       if (newContent.length === 0) return;
-      setConversation((prev) => {
-        const newConversation = [
-          ...prev,
-          {
-            id: prev.length + 1,
-            time: new Date(),
-            author: "user",
-            content: newContent,
-            status: ConversationRequestStatus.PROGRESSING,
-          },
-        ];
-        requestNewReply(newConversation);
-        return newConversation;
-      });
+      setConversation((prev) => [
+        ...prev,
+        {
+          id: generateConversationId("user"),
+          time: new Date(),
+          author: "user",
+          content: newContent,
+          status: ConversationRequestStatus.PROGRESSING,
+        },
+      ]);
       setInputValue("");
     },
-    [requestNewReply]
+    [requestNewConversation]
   );
+
+  useEffect(() => {
+    const onRequestConversation = async () => {
+      const newConversation = conversation[conversation.length - 1];
+      if (newConversation?.status === ConversationRequestStatus.PROGRESSING) {
+        await requestNewConversation([...conversation]);
+      }
+    };
+    onRequestConversation();
+  }, [conversation]);
 
   const state = useMemo(
     () => ({
@@ -82,6 +117,8 @@ export default function ChatBoxProvider({
         isSpeaking,
         isProgressing,
         isSupportSpeech,
+
+        loadingTime,
       },
       actions: {
         startSpeech,
@@ -97,6 +134,7 @@ export default function ChatBoxProvider({
       isSpeaking,
       isProgressing,
       isSupportSpeech,
+      loadingTime,
 
       startSpeech,
       handleInputChange,

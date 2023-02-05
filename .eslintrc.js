@@ -24,7 +24,12 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["src/types/*.ts", "**/*.d.ts"],
+      files: [
+        "src/types/*.ts",
+        "src/types/api/*.ts",
+        "src/lib/*.ts",
+        "**/*.d.ts",
+      ],
       rules: {
         "no-undef": "off",
         "no-unused-vars": "off",

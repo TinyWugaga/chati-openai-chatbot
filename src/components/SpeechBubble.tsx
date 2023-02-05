@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled, { keyframes, css } from "styled-components";
 
 import { mediaQueryScreen } from "@/assets/styles/mixin";
@@ -6,11 +7,19 @@ export default function SpeechBubble({
   text,
   direction = "right",
   isLoading = false,
+  container,
 }: {
   text: string;
   direction?: string;
   isLoading?: boolean;
+  container?: HTMLDivElement | null;
 }) {
+  useEffect(() => {
+    if (container) {
+      container.scrollTo(0, container.scrollHeight);
+    }
+  }, [container]);
+
   return (
     <BubbleContainer>
       <Bubble direction={direction}>
@@ -67,7 +76,7 @@ const BubbleContainer = styled.div`
   height: auto;
 
   transform: scale(0);
-  animation: 0.38s ease-out 500ms 1 normal forwards running
+  animation: 0.18s ease-out 100ms 1 normal forwards running
     ${BubbleBounceKeyframe};
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -91,7 +100,8 @@ const Bubble = styled.div<{ direction: string }>`
     max-width: 78%;
   }
 
-  animation: 0.38s ease-out 500ms 1 normal backwards running ${BubbleKeyframe};
+  transform: translateY(0);
+  animation: 0.18s ease-out 100ms 1 normal forwards running ${BubbleKeyframe};
   transform-box: fill-box;
   transform-origin: 50% 50%;
 `;
@@ -107,7 +117,7 @@ const LoadingCSS = css`
 
     letter-spacing: 2px;
 
-    animation: 1.2s linear 500ms infinite normal forwards running
+    animation: 1s linear 300ms infinite normal forwards running
       ${LoadingKeyframe};
   }
 `;

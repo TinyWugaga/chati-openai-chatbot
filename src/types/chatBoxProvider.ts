@@ -1,11 +1,12 @@
 export enum ConversationRequestStatus {
   PROGRESSING = "progressing",
+  FINISHED = "finished",
   SUCCESS = "success",
   ERROR = "error",
 }
 
 export interface Conversation {
-  id: number;
+  id: string;
   time: Date;
   author: string;
   content: string;
@@ -20,6 +21,8 @@ export interface ChatBoxState {
   isSpeaking: boolean;
   isProgressing: boolean;
   isSupportSpeech: boolean;
+
+  loadingTime: number;
 }
 export interface ChatBoxAction {
   startSpeech: () => void;
