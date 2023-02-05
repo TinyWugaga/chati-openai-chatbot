@@ -21,7 +21,9 @@ class SpeechRecognition {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (SpeechRecognition === undefined) {
+    const isChromeIos = !!window.navigator.userAgent.match(/CriOS/i);
+
+    if (SpeechRecognition === undefined || isChromeIos) {
       throw new Error("Can not detect the SpeechRecognition API");
     }
 
