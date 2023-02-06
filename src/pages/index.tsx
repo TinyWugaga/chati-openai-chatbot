@@ -1,7 +1,13 @@
+import dynamic from "next/dynamic";
+
 import { ChatBoxProvider } from "@/apps/ChatBox";
 
+import LoadingBar from "@/components/Layouts/LoadingBar";
 import { BasicLayout as Layout } from "@/components/Layouts";
-import ChatBox from "@/components/ChatBox";
+
+const ChatBox = dynamic(() => import("@/components/ChatBox"), {
+  loading: () => <LoadingBar />,
+});
 
 export default function Home() {
   return (
