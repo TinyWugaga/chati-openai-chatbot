@@ -3,7 +3,7 @@ interface Font {
   wght?: string[];
 }
 
-export default function generateFontLinks(fonts: Font[]) {
+export function generateFontLinks(fonts: Font[]) {
   return fonts.reduce((acc, { family, wght }) => {
     const accFonts = acc ? `${acc}&` : "";
     const fontFamily = `family=${family}`;

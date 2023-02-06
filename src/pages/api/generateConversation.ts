@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import OpenAI from "@/lib/OpenAI";
-import logger from "@/lib/logger";
+import { sendEvent } from "@/lib/googleAnalytics";
 
 import { CHATTING_AI_PROMPT } from "@/utils/constant";
 
@@ -35,8 +35,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     error: ConversationAPIError,
     conversation: Conversation | {}
   ) => {
-    logger.error({
-      generateConversationAPIError: { conversation, error },
+    sendEvent("api_error", {
+      category: "api",
+      label: "error",
+      apiPath: "generateConversation",
+      conversation,
     });
 
     res.status(error.status).json({ conversation, error });

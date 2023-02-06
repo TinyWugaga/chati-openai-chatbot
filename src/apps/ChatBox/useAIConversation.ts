@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 
-import logger from "@/lib/logger";
 import {
   Conversation,
   GenerateConversationAPIResult,
@@ -18,8 +17,6 @@ export default function useAIConversation() {
       GenerateConversationAPIResult | GenerateConversationAPIError
     > => {
       let stopTimer = false;
-      logger.log({ fetchGenerateConversationAPI: conversations });
-
       const loadingTimeInterval = setInterval(() => {
         if (!stopTimer) {
           setLoadingTime((time) => time + 1);
@@ -60,9 +57,7 @@ export default function useAIConversation() {
           ...response,
         };
       } catch (error: any) {
-        logger.error({ requestConversationError: error });
         setIsProgressing(false);
-
         throw error;
       }
     },

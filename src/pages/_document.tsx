@@ -1,7 +1,7 @@
 import NextDocument, { Html, Head, Main, NextScript } from "next/document";
 
 import { googleFontLinks } from "@/assets/styles/fonts";
-import generateFontLinks from "@/utils/generateFontLinks";
+import { generateFontLinks } from "@/utils/generateFontLinks";
 
 export default class Document extends NextDocument {
   render() {
@@ -30,9 +30,9 @@ export default class Document extends NextDocument {
           />
 
           {/* Global site tag (gtag.js) - Google Analytics */}
-          {/* <script
+          <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS}`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -40,13 +40,17 @@ export default class Document extends NextDocument {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}', {
+                gtag('config', '${process.env.GOOGLE_ANALYTICS}', {
                   page_path: window.location.pathname
-                  ${(process.env.NODE_ENV === 'development' && ",debug_event: 1,traffic_type : 'internal'") || ''}
+                  ${
+                    (!process.env.IS_PROD &&
+                      ",debug_event: 1,traffic_type : 'internal'") ||
+                    ""
+                  }
                 });
-              `
+              `,
             }}
-          /> */}
+          />
         </Head>
         <body>
           <Main />

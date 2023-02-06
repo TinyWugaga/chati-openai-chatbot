@@ -1,6 +1,8 @@
 import { ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import styled from "styled-components";
 
+import { sendLogEvent } from "@/lib/googleAnalytics";
+
 import { useChatBox } from "@/apps/ChatBox";
 
 import SpeechButton from "@/components/SpeechButton";
@@ -90,7 +92,15 @@ export default function ChatBox() {
           />
           <ChatBoxSendButtonWrapper>
             <SendButton
-              onClick={() => handleSubmit(inputValue)}
+              onClick={() => {
+                sendLogEvent(null, {
+                  event: "click_send_button",
+                  category: "action",
+                  label: "click",
+                  element: "send_button",
+                });
+                handleSubmit(inputValue);
+              }}
               disabled={isSpeaking || isProgressing}
               isActive={isProgressing}
             />
@@ -98,7 +108,15 @@ export default function ChatBox() {
         </ChatBoxForm>
         {isSupportSpeech && (
           <SpeechButton
-            onClick={onStartSpeech}
+            onClick={() => {
+              sendLogEvent(null, {
+                event: "click_speech_button",
+                category: "action",
+                label: "click",
+                element: "speech_button",
+              });
+              onStartSpeech();
+            }}
             disabled={isSpeaking || isProgressing}
             isActive={isSpeaking}
           />

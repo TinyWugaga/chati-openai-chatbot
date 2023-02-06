@@ -53,7 +53,6 @@ class OpenAI {
 
       const choices = completion.data.choices;
       logger.log({ choices });
-
       const result = choices[0].text;
       return result;
     } catch (error: any) {

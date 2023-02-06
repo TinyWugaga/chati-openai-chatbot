@@ -1,7 +1,23 @@
 import { noop } from "@/utils/noop";
+import { generateErrorEventParams } from "@/utils/generateEventParams";
 
-// TODO: record to ga when IS_PROD
+interface customParams {
+  [key: string]: any;
+}
+
+export const consoleLog = (message: any, params: customParams = {}) =>
+  console.log({
+    ...(message && { ...message }),
+    ...params,
+  });
+
+export const consoleError = (error: any, params: customParams = {}) =>
+  console.error({
+    ...generateErrorEventParams(error),
+    ...params,
+  });
+
 export default {
-  log: !process.env.IS_PROD ? console.log : noop,
-  error: !process.env.IS_PROD ? console.error : noop,
+  log: !process.env.IS_PROD ? consoleLog : noop,
+  error: !process.env.IS_PROD ? consoleError : noop,
 };

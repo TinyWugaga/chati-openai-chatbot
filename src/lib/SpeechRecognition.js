@@ -74,8 +74,6 @@ class SpeechRecognition {
       .map((result) => result.transcript)
       .join("");
 
-    logger.log("Text: " + transcript);
-
     this._currentText = transcript.trim();
     this._speakingTimeCount = 0;
   }

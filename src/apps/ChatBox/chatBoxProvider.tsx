@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import { ConversationRequestStatus, Conversation } from "@/types";
-import logger from "@/lib/logger";
+import { sendLogEvent, sendErrorEvent } from "@/lib/googleAnalytics";
 
 import Context from "./context";
 
@@ -41,6 +41,14 @@ export default function ChatBoxProvider({
           status: ConversationRequestStatus.FINISHED,
         });
 
+        const logEvent = {
+          event: "request_new_conversation_result",
+          category: "request_new_conversation",
+          label: "result",
+          appName: "chatBox",
+          conversation: JSON.stringify(conversation),
+        };
+
         if (result) {
           setConversation([
             ...newConversation,
@@ -52,6 +60,11 @@ export default function ChatBoxProvider({
               status: ConversationRequestStatus.SUCCESS,
             },
           ]);
+          sendLogEvent(null, {
+            ...logEvent,
+            status: ConversationRequestStatus.SUCCESS,
+            result,
+          });
         }
         if (error) {
           setConversation([
@@ -64,9 +77,19 @@ export default function ChatBoxProvider({
               status: ConversationRequestStatus.ERROR,
             },
           ]);
+          sendLogEvent(null, {
+            ...logEvent,
+            status: ConversationRequestStatus.ERROR,
+            error: error.message,
+          });
         }
       } catch (error: any) {
-        logger.error({ requestNewConversation: error });
+        sendErrorEvent(error, {
+          event: "request_new_conversation_error",
+          category: "request_new_conversation",
+          label: "error",
+          appName: "chatBox",
+        });
         newConversation.pop();
         setConversation([...newConversation]);
       }
