@@ -9,7 +9,10 @@ import SpeechButton from "@/components/SpeechButton";
 import SendButton from "@/components/SendButton";
 import SpeechBubble from "@/components/SpeechBubble";
 
-import { backgroundHexColorDarken } from "@/assets/styles/mixin";
+import {
+  backgroundHexColorDarken,
+  mediaQueryScreen,
+} from "@/assets/styles/mixin";
 
 export default function ChatBox() {
   const ChatBoxContentContainerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +60,13 @@ export default function ChatBox() {
 
   return (
     <ChatBoxContainer>
+      <ChatBoxHeader>
+        <div>
+          <ChatBoxDot />
+          <ChatBoxDot />
+          <ChatBoxDot />
+        </div>
+      </ChatBoxHeader>
       <ChatBoxContent>
         <ChatBoxContentContainer ref={ChatBoxContentContainerRef}>
           {conversation?.map(({ id, author, content }) => (
@@ -77,7 +87,7 @@ export default function ChatBox() {
           )}
         </ChatBoxContentContainer>
       </ChatBoxContent>
-      <ChatBoxNavbar>
+      <ChatBoxToolbar>
         <ChatBoxForm onSubmit={onSubmit}>
           <ChatBoxInput
             type="text"
@@ -121,14 +131,14 @@ export default function ChatBox() {
             isActive={isSpeaking}
           />
         )}
-      </ChatBoxNavbar>
+      </ChatBoxToolbar>
     </ChatBoxContainer>
   );
 }
 
 export const ChatBoxContainer = styled.div`
   display: grid;
-  grid-template-rows: 1fr 7.5rem;
+  grid-template-rows: 4rem 1fr 7.5rem;
 
   position: fixed;
   width: min(100%, 48rem);
@@ -137,12 +147,61 @@ export const ChatBoxContainer = styled.div`
   padding: 0;
 
   background-color: ${({ theme }) => theme.colors.green.main};
+
+  ${mediaQueryScreen("tablet", "up")} {
+    grid-template-rows: 3rem 1fr 7.5rem;
+
+    position: relative;
+    box-shadow: 0px 4px 4px ${({ theme }) => theme.colors.black.main + "50"};
+    border-radius: 0.3rem;
+  }
+`;
+
+export const ChatBoxHeader = styled.header`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  padding: 1.2rem 1rem;
+
+  background: ${({ theme }) => theme.colors.primary.dark};
+
+  > div {
+    display: flex;
+  }
+
+  ${mediaQueryScreen("tablet", "up")} {
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+  }
+`;
+
+export const ChatBoxDot = styled.div`
+  position: relative;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-left: 0.4rem;
+
+  border-radius: 3rem;
+
+  background: ${({ theme }) => theme.colors.white.main + "90"};
 `;
 
 export const ChatBoxContent = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+
+  ${mediaQueryScreen("tablet", "up")} {
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+  }
 `;
 
 export const ChatBoxContentContainer = styled.div`
@@ -158,7 +217,7 @@ export const ChatBoxContentContainer = styled.div`
   gap: 2rem;
 `;
 
-export const ChatBoxNavbar = styled.div`
+export const ChatBoxToolbar = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -173,6 +232,11 @@ export const ChatBoxNavbar = styled.div`
       theme.colors.primary.main,
       theme.colors.primary.dark
     )};
+
+  ${mediaQueryScreen("tablet", "up")} {
+    border-bottom-left-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+  }
 `;
 
 export const ChatBoxSendButtonWrapper = styled.div`

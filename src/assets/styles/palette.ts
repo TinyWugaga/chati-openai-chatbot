@@ -33,13 +33,13 @@ export const lightModeColors: Colors = {
     text: palette.black.main,
   },
   secondary: {
-    ...palette.blue,
-    text: palette.white.main,
+    ...palette.yellow,
+    text: palette.black.main,
   },
   info: { main: "#4E89AE", dark: "#43658B" },
   warning: { ...palette.orange },
   error: { main: "#F48484", dark: "#F55050" },
-  success: { ...palette.yellow },
+  success: { ...palette.blue },
 
   text: {
     primary: palette.black.main,

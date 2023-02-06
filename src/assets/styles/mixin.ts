@@ -17,23 +17,20 @@ export const boxShadowBorder = (color: string): string => {
 };
 
 export const mediaQueryScreen = (
-  screen: "desktop" | "laptop" | "tablet" | "mobile"
+  screen: "desktop" | "laptop" | "tablet" | "mobile",
+  range: "only" | "up" | "down" = "only"
 ) => {
-  switch (screen) {
-    // Desktops, large screens
-    case "desktop":
-      return "@media screen and (min-width:64.01rem) and (max-width:75rem)";
-    // Small screens, laptops
-    case "laptop":
-      return "@media screen and (min-width:48.01rem) and (max-width:64rem)";
-    // iPads, Tablets
-    case "tablet":
-      return "@media screen and (min-width:30.01rem) and (max-width:48rem)";
-    // Mobile
-    case "mobile":
-      return "@media screen and (min-width:20rem) and (max-width:30rem)";
-    // Extra large screens, TV
-    default:
-      return "@media screen and (min-width:75.01rem)";
-  }
+  const hasMinWidth = ["only", "up"].includes(range);
+  const hasMaxWidth = ["only", "down"].includes(range);
+
+  const screens = {
+    desktop: ["64.01rem", "75rem"],
+    laptop: ["48.01rem", "64rem"],
+    tablet: ["30.01rem", "48rem"],
+    mobile: ["20rem", "30rem"],
+  };
+
+  return `@media screen ${
+    hasMinWidth ? ` and (min-width:${screens[screen][1]})` : ""
+  }${hasMaxWidth ? ` and (max-width:${screens[screen][0]})` : ""}`;
 };

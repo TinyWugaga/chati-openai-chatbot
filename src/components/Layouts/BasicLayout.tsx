@@ -1,8 +1,13 @@
 import { PropsWithChildren } from "react";
-
 import styled from "styled-components";
 
-const Main = styled.main`
+import { mediaQueryScreen } from "@/assets/styles/mixin";
+
+export default function BasicLayout({ children }: PropsWithChildren) {
+  return <Main>{children}</Main>;
+}
+
+export const Main = styled.main`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,8 +18,8 @@ const Main = styled.main`
 
   width: 100dvw;
   height: 100dvh;
-`;
 
-export default function BasicLayout({ children }: PropsWithChildren) {
-  return <Main>{children}</Main>;
-}
+  ${mediaQueryScreen("tablet", "up")} {
+    padding: 1.2rem 1.4rem;
+  }
+`;

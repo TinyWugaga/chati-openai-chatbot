@@ -2,19 +2,20 @@ import dynamic from "next/dynamic";
 
 import { ChatBoxProvider } from "@/apps/ChatBox";
 
-import LoadingBar from "@/components/Layouts/LoadingBar";
+import { LoadingView } from "@/components/Layouts";
 import { BasicLayout as Layout } from "@/components/Layouts";
 
 const ChatBox = dynamic(() => import("@/components/ChatBox"), {
-  loading: () => <LoadingBar />,
+  loading: () => <LoadingView />,
+  ssr: false,
 });
 
 export default function Home() {
   return (
     <ChatBoxProvider>
-      <Layout>
-        <ChatBox />
-      </Layout>
+      <ChatBox />
     </ChatBoxProvider>
   );
 }
+
+Home.Layout = Layout;
