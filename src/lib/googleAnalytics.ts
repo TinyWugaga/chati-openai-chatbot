@@ -19,22 +19,22 @@ export interface GoogleTagEventParams {
 }
 
 export const sendLogEvent = (message: any, params: CustomEventParams = {}) => {
-  const { event = "console_log" } = params;
+  const { event = "console_log", ...data } = params;
   sendEvent(event, {
     category: "logger",
     label: "log",
-    ...(message && { ...message }),
-    ...params,
+    message,
+    ...data,
   });
 };
 
 export const sendErrorEvent = (error: any, params: CustomEventParams = {}) => {
-  const { event = "console_error" } = params;
+  const { event = "console_error", ...data } = params;
   sendEvent(event, {
     category: "logger",
     label: "error",
     ...generateErrorEventParams(error),
-    ...params,
+    ...data,
   });
 };
 
