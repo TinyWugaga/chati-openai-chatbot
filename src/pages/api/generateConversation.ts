@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import OpenAI from "@/lib/OpenAI";
 import { sendEvent } from "@/lib/googleAnalytics";
+import notion from "@/database/notion";
 
 import { CHATTING_AI_PROMPT } from "@/utils/constant";
 
@@ -41,6 +42,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       apiPath: "generateConversation",
       conversation,
     });
+    notion.addLogEvent({
+      event: "console_error",
+      type: "error",
+      api: "generateConversation",
+      message: `Conversation request failed.\nid:${
+        (conversation as Conversation).id || "unknown"
+      }\nContent:${(conversation as Conversation).content || ""}`,
+      extra: error,
+    });
 
     res.status(error.status).json({ conversation, error });
   };
@@ -66,6 +76,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       { ...requestConversation },
     ]);
     const result = await openai.createConversation(content);
+
+    notion.addLogEvent({
+      event: "console_log",
+      type: "log",
+      api: "generateConversation",
+      message: result || "",
+      extra: requestConversation,
+    });
 
     res.status(200).json({ conversation: requestConversation, result });
   } catch (error: any) {

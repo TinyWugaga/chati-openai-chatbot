@@ -14,6 +14,9 @@
       "@/assets/*": [
         "src/assets/*"
       ],
+      "@/database/*": [
+        "src/database/*"
+      ],
       "@/lib/*": [
         "src/lib/*"
       ],
@@ -52,7 +55,7 @@
   "include": [
     "next-env.d.ts",
     "src/global.d.ts",
-    "src/lib/OpenAI.d.ts",
+    "src/lib/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
   ],
