@@ -1,7 +1,7 @@
 const prod = process.env.NODE_ENV === "production";
 
 const localhost = "http://localhost:3000/";
-const apiDomain = prod ? process.env.DEPLOY_DOMAIN : localhost;
+const apiDomain = prod ? process.env.NEXT_PUBLIC_VERCEL_URL : localhost;
 
 const IS_DEV =
   process.env.NODE_ENV === "development" ||

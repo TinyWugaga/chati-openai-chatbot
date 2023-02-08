@@ -1,19 +1,20 @@
 export interface NotionLogProperties {
-  event: "console_log" | "console_error";
+  logger: "console_log" | "console_error";
   type: "log" | "error";
   api: string;
   message: string;
+  url: string;
   extra?: any;
 }
 
 export function generateNotionLogProperties(properties: NotionLogProperties) {
-  const { event, type, api, message, extra = {} } = properties;
+  const { logger, type, api, message, url, extra = {} } = properties;
   return {
-    event: {
+    logger: {
       title: [
         {
           text: {
-            content: event,
+            content: logger,
           },
         },
       ],
@@ -49,6 +50,9 @@ export function generateNotionLogProperties(properties: NotionLogProperties) {
           },
         },
       ],
+    },
+    url: {
+      url,
     },
   };
 }

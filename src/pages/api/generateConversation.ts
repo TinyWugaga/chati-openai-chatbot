@@ -43,12 +43,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       conversation,
     });
     notion.addLogEvent({
-      event: "console_error",
+      logger: "console_error",
       type: "error",
       api: "generateConversation",
       message: `Conversation request failed.\nid:${
         (conversation as Conversation).id || "unknown"
       }\nContent:${(conversation as Conversation).content || ""}`,
+      url: process.env.API_DOMAIN || "",
       extra: error,
     });
 
@@ -78,10 +79,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const result = await openai.createConversation(content);
 
     notion.addLogEvent({
-      event: "console_log",
+      logger: "console_log",
       type: "log",
       api: "generateConversation",
       message: result || "",
+      url: process.env.API_DOMAIN || "",
       extra: requestConversation,
     });
 
