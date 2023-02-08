@@ -46,7 +46,9 @@ export default function ChatBoxProvider({
           category: "request_new_conversation",
           label: "result",
           appName: "chatBox",
-          conversation: JSON.stringify(conversation),
+          conversationId: conversation.id,
+          conversationAuthor: conversation.author,
+          conversationContent: conversation.content,
         };
 
         if (result) {
@@ -84,13 +86,16 @@ export default function ChatBoxProvider({
           });
         }
       } catch (error: any) {
+        const currentConversation = newConversation.pop();
         sendErrorEvent(error, {
           event: "request_new_conversation_error",
           category: "request_new_conversation",
           label: "error",
           appName: "chatBox",
+          conversationId: currentConversation?.id,
+          conversationAuthor: currentConversation?.author,
+          conversationContent: currentConversation?.content,
         });
-        newConversation.pop();
         setConversation([...newConversation]);
       }
     },
