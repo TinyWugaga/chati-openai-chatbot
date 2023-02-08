@@ -86,7 +86,7 @@ export default function ChatBoxProvider({
           });
         }
       } catch (error: any) {
-        const currentConversation = newConversation.pop();
+        const currentConversation = [...newConversation].pop();
         sendErrorEvent(error, {
           event: "request_new_conversation_error",
           category: "request_new_conversation",
@@ -96,7 +96,16 @@ export default function ChatBoxProvider({
           conversationAuthor: currentConversation?.author,
           conversationContent: currentConversation?.content,
         });
-        setConversation([...newConversation]);
+        setConversation([
+          ...newConversation,
+          {
+            id: generateConversationId("system"),
+            time: new Date(),
+            author: "system",
+            content: error.message,
+            status: ConversationRequestStatus.ERROR,
+          },
+        ]);
       }
     },
     [requestConversation]

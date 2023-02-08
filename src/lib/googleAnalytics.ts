@@ -39,7 +39,7 @@ export const sendErrorEvent = (error: any, params: CustomEventParams = {}) => {
 };
 
 export function sendEvent(name: string, params: GoogleTagEventParams) {
-  const gtag = window.gtag;
+  const gtag = typeof window !== "undefined" && window.gtag;
   const { category, label, ...data } = params;
 
   if (process.env.IS_PROD && gtag) {
