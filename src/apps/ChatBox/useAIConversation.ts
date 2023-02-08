@@ -52,7 +52,7 @@ export default function useAIConversation() {
 
   const requestConversation = useCallback(
     async (newConversations: Conversation[]) => {
-      const currentConversation = newConversations.pop() || {
+      const currentConversation = [...newConversations].pop() || {
         id: "unknown",
         author: "unknown",
         content: "unknown",
