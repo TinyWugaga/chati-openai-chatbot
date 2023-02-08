@@ -30,12 +30,17 @@ const generateContent = (newConversation: Conversation[]) => {
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const openai = new OpenAI();
   const conversations = (req.body.conversations || []) as Conversation[];
-  const requestConversation = conversations.pop();
+  const requestConversation = [...conversations].pop();
 
   const handleError = (
     error: ConversationAPIError,
-    conversation: Conversation | {}
+    conversation: Conversation | undefined
   ) => {
+    const currentConversation = conversation || {
+      id: "unknown",
+      author: "unknown",
+      content: "",
+    };
     sendEvent("api_error", {
       category: "api",
       label: "error",
@@ -46,14 +51,12 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       logger: "console_error",
       type: "error",
       api: "generateConversation",
-      message: `Conversation request failed.\nid:${
-        (conversation as Conversation).id || "unknown"
-      }\nContent:${(conversation as Conversation).content || ""}`,
+      message: `Conversation request failed.\nid:${currentConversation.id}\nContent:${currentConversation.content}`,
       url: process.env.API_DOMAIN || "",
       extra: error,
     });
 
-    res.status(error.status).json({ conversation, error });
+    res.status(error.status).json({ conversation: currentConversation, error });
   };
 
   try {
@@ -67,15 +70,12 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           message: "Invalid content.",
           status: 400,
         },
-        { ...requestConversation }
+        requestConversation
       );
       return;
     }
 
-    const content = generateContent([
-      ...conversations,
-      { ...requestConversation },
-    ]);
+    const content = generateContent(conversations);
     const result = await openai.createConversation(content);
 
     notion.addLogEvent({
@@ -97,7 +97,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           name: GenerateConversationAPIErrorType.RESPONSE_ERROR,
           status: errorResponse.status,
         },
-        { ...requestConversation }
+        requestConversation
       );
     } else {
       handleError(
@@ -106,7 +106,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           message: `An ${error.name} occurred during your request.`,
           status: 500,
         },
-        { ...requestConversation }
+        requestConversation
       );
     }
   }
