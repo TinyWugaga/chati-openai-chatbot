@@ -15,6 +15,8 @@ module.exports = {
   IS_PROD,
   LOCAL_DOMAIN: localhost,
   API_DOMAIN: apiDomain,
+
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
+  NOTION_TOKEN: process.env.NOTION_TOKEN,
 };

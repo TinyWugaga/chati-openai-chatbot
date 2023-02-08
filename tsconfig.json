@@ -54,7 +54,7 @@
     "src/global.d.ts",
     "src/lib/OpenAI.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
   ],
   "exclude": [
     "node_modules"
