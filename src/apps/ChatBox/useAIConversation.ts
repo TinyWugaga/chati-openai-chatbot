@@ -58,7 +58,15 @@ export default function useAIConversation() {
         };
       } catch (error: any) {
         setIsProgressing(false);
-        throw error;
+        return {
+          error,
+          result: "",
+          conversation: newConversations.pop() || {
+            id: "unknown",
+            author: "unknown",
+            content: "unknown",
+          },
+        };
       }
     },
     [fetchGenerateConversationAPI]
