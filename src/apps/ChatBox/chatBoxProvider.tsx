@@ -40,6 +40,7 @@ export default function ChatBoxProvider({
         if (!conversation) {
           newConversation.pop();
           setConversation([...newConversation]);
+          return;
         }
 
         updateConversationPropertyById(newConversation, conversation.id, {
