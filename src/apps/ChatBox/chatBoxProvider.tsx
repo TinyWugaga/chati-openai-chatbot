@@ -37,6 +37,11 @@ export default function ChatBoxProvider({
         const reply = await requestConversation([...newConversation]);
         const { result, error, conversation } = reply;
 
+        if (!conversation) {
+          newConversation.pop();
+          setConversation([...newConversation]);
+        }
+
         updateConversationPropertyById(newConversation, conversation.id, {
           status: ConversationRequestStatus.FINISHED,
         });
@@ -86,7 +91,7 @@ export default function ChatBoxProvider({
           });
         }
       } catch (error: any) {
-        const currentConversation = [...newConversation].pop();
+        const currentConversation = newConversation.pop() as Conversation;
         sendErrorEvent(error, {
           event: "request_new_conversation_error",
           category: "request_new_conversation",
@@ -98,6 +103,7 @@ export default function ChatBoxProvider({
         });
         setConversation([
           ...newConversation,
+          { ...currentConversation, status: ConversationRequestStatus.FAILED },
           {
             id: generateConversationId("system"),
             time: new Date(),

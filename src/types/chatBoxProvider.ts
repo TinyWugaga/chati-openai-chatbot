@@ -1,6 +1,7 @@
 export enum ConversationRequestStatus {
   PROGRESSING = "progressing",
   FINISHED = "finished",
+  FAILED = "failed",
   SUCCESS = "success",
   ERROR = "error",
 }

@@ -14,7 +14,9 @@ export default function useAIConversation() {
     async (
       conversations: Conversation[]
     ): Promise<
-      GenerateConversationAPIResult | GenerateConversationAPIError
+      | GenerateConversationAPIResult
+      | GenerateConversationAPIError
+      | { error: any }
     > => {
       let stopTimer = false;
       const loadingTimeInterval = setInterval(() => {
@@ -25,27 +27,36 @@ export default function useAIConversation() {
         }
       }, 500);
 
-      const result = await fetch("/api/generateConversation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ conversations }),
-      })
-        .then((response) => response.json())
-        .catch((error) => error);
+      try {
+        const result = await fetch("/api/generateConversation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ conversations }),
+        })
+          .then((response) => response.json())
+          .catch((error) => error);
 
-      if (result) {
-        stopTimer = true;
-        setLoadingTime(0);
+        if (result) {
+          stopTimer = true;
+          setLoadingTime(0);
+        }
+        return result;
+      } catch (error: any) {
+        return { error };
       }
-      return result;
     },
     []
   );
 
   const requestConversation = useCallback(
     async (newConversations: Conversation[]) => {
+      const currentConversation = newConversations.pop() || {
+        id: "unknown",
+        author: "unknown",
+        content: "unknown",
+      };
       try {
         setIsProgressing(true);
         const response = await fetchGenerateConversationAPI(newConversations);
@@ -54,6 +65,7 @@ export default function useAIConversation() {
         return {
           error: undefined,
           result: "",
+          conversation: currentConversation,
           ...response,
         };
       } catch (error: any) {
@@ -61,11 +73,7 @@ export default function useAIConversation() {
         return {
           error,
           result: "",
-          conversation: newConversations.pop() || {
-            id: "unknown",
-            author: "unknown",
-            content: "unknown",
-          },
+          conversation: currentConversation,
         };
       }
     },
