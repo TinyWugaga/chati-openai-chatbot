@@ -7,7 +7,7 @@ interface customParams {
 
 export const consoleLog = (message: any, params: customParams = {}) =>
   console.log({
-    ...(message && { ...message }),
+    message,
     ...params,
   });
 
