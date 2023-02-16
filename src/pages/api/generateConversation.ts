@@ -3,28 +3,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "@/lib/OpenAI";
 import { sendEvent } from "@/lib/googleAnalytics";
 
-import { CHATTING_AI_PROMPT } from "@/utils/constant";
+import validateContent from "@/utils/api/validateContent";
+import generateContent from "@/utils/api/generateContent";
 
 import {
   Conversation,
   ConversationAPIError,
   GenerateConversationAPIErrorType,
 } from "@/types";
-
-const validateContent = (content: string) => {
-  const isInvalid = content.trim().length === 0 || content.match(/sex/i);
-  return !isInvalid;
-};
-
-const generateContent = (newConversation: Conversation[]) => {
-  // TODO: add sort
-  const content = newConversation
-    .filter(({ author }) => ["user", "ai"].includes(author))
-    .map(({ author, content }) => `${author}:${content}`)
-    .join("\n");
-
-  return `${CHATTING_AI_PROMPT}\n${content ? content + "\n" : ""}ai:`;
-};
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const openai = new OpenAI();
