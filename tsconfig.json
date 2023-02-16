@@ -54,7 +54,11 @@
     "src/global.d.ts",
     "src/lib/OpenAI.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "src/utils/api/__test__/validateContent.test.jsst.js",
+    "src/utils/api/__test__/validateContent.test.jsst.js",
+    "src/utils/api/__test__/generateContent.test.js",
+    "src/utils/api/__test__/generateContent.test.js"
   ],
   "exclude": [
     "node_modules"
