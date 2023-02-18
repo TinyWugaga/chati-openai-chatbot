@@ -18,7 +18,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
+  plugins: ["react", "@typescript-eslint", "testing-library"],
   rules: {
     "react/react-in-jsx-scope": "off",
   },
@@ -35,6 +35,11 @@ module.exports = {
         "no-unused-vars": "off",
         "no-var": "off",
       },
+    },
+    // Only uses Testing Library lint rules in test files
+    {
+      files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      extends: ["plugin:testing-library/react"],
     },
   ],
 };
