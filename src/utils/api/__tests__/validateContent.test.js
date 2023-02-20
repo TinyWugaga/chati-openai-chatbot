@@ -1,5 +1,4 @@
 import validateContent from "../validateContent";
-import { TEST_SENSITIVE_WORDS } from "./_utils";
 
 describe("Validate prompt content", () => {
   test("Normal content is valid", () => {
@@ -11,6 +10,7 @@ describe("Validate prompt content", () => {
   });
 
   test("Sensitive words is invalid", () => {
+    const TEST_SENSITIVE_WORDS = ["sex", "幹"][Math.floor(Math.random() * 2)];
     expect(validateContent(TEST_SENSITIVE_WORDS)).toBeFalsy();
   });
 });

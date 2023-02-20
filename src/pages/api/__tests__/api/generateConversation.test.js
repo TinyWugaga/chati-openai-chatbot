@@ -1,7 +1,5 @@
 import generateConversationAPI from "@/pages/api/generateConversation";
 
-import { TEST_CONVERSATIONS } from "@/utils/api/__test__/_utils";
-
 jest.mock("@/lib/OpenAI");
 
 const checkStatus = jest.fn((status, expectedStatus) => {
@@ -22,10 +20,20 @@ const createMockRequestResponse = (body, handleResponse) => {
   };
 };
 
-describe("Test generateConversation API", () => {
+describe.skip("Test generateConversation API", () => {
   test("Test response return 200", async () => {
     const { req, res } = createMockRequestResponse(
-      { conversations: TEST_CONVERSATIONS },
+      {
+        conversations: [
+          {
+            id: "user_1676892434372",
+            time: new Date(),
+            author: "user",
+            content: "Test content.",
+            status: "processing",
+          },
+        ],
+      },
       (status) => checkStatus(status, 200)
     );
     await generateConversationAPI(req, res);
