@@ -56,7 +56,7 @@ export function sendEvent(
     ...value,
   } as GoogleTagEventParams;
 
-  if (process.env.IS_PROD && gtag) {
+  if ((process.env.IS_PROD || process.env.IS_PREVIEW) && gtag) {
     gtag("event", eventName, gtagParams);
   } else {
     if (category === "error") {

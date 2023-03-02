@@ -19,7 +19,7 @@ export const consoleError = (error: any, params: customParams = {}) =>
 
 export default {
   log: (logger: string, message: string, extra = {}) => {
-    if (!process.env.IS_PROD) {
+    if (!process.env.IS_PROD && !process.env.IS_PREVIEW) {
       consoleLog(message, {
         logger,
         ...extra,
@@ -30,7 +30,7 @@ export default {
     }
   },
   error: (logger: string, error: any, extra = {}) => {
-    if (!process.env.IS_PROD) {
+    if (!process.env.IS_PROD && !process.env.IS_PREVIEW) {
       consoleError(error, {
         logger,
         ...extra,
