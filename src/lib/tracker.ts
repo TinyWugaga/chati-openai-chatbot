@@ -62,7 +62,7 @@ export function sendEvent(
     if (category === "error") {
       logger.error(eventName, gtagParams);
     } else {
-      // logger.log("GA Tracker", eventName, gtagParams);
+      logger.log("GA Tracker", eventName, gtagParams);
     }
   }
 }
