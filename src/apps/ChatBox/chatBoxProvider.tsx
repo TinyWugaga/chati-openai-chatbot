@@ -1,162 +1,50 @@
-import {
-  useState,
-  useMemo,
-  useCallback,
-  useEffect,
-  PropsWithChildren,
-} from "react";
+import { useState, useMemo, useCallback, PropsWithChildren } from "react";
 
-import { ConversationRequestStatus, Conversation } from "@/types";
-import { sendLogEvent, sendErrorEvent } from "@/lib/googleAnalytics";
+import { ConversationStatus } from "@/types";
+import { trackAction, trackError } from "@/lib/tracker";
 
 import Context from "./context";
 
 import useSpeech from "./useSpeech";
 import useAIConversation from "./useAIConversation";
 
-import {
-  generateConversationId,
-  updateConversationPropertyById,
-} from "./utils";
-
 export default function ChatBoxProvider({
   children,
 }: PropsWithChildren<unknown>) {
   const [inputValue, setInputValue] = useState("");
-  const [conversation, setConversation] = useState<Conversation[]>([]);
 
   const { currentSpeechText, startSpeech, isSpeaking, isSupportSpeech } =
     useSpeech();
-  const { requestConversation, isProgressing, loadingTime } =
+  const { isProgressing, loadingTime, conversations, sendMessage } =
     useAIConversation();
-
-  const requestNewConversation = useCallback(
-    async (newConversation: Conversation[]) => {
-      if (newConversation.length === 0) return;
-      try {
-        const reply = await requestConversation([...newConversation]);
-        const { result, error, conversation } = reply;
-
-        if (!conversation) {
-          newConversation.pop();
-          setConversation([...newConversation]);
-          return;
-        }
-
-        updateConversationPropertyById(newConversation, conversation.id, {
-          status: ConversationRequestStatus.FINISHED,
-        });
-
-        const logEvent = {
-          event: "request_new_conversation_result",
-          category: "request_new_conversation",
-          label: "result",
-          appName: "chatBox",
-          conversationId: conversation.id,
-          conversationAuthor: conversation.author,
-          conversationContent: conversation.content,
-        };
-
-        if (result) {
-          setConversation([
-            ...newConversation,
-            {
-              id: generateConversationId("ai"),
-              time: new Date(),
-              author: "ai",
-              content: result,
-              status: ConversationRequestStatus.SUCCESS,
-            },
-          ]);
-          sendLogEvent(null, {
-            ...logEvent,
-            status: ConversationRequestStatus.SUCCESS,
-            result,
-          });
-        }
-        if (error) {
-          setConversation([
-            ...newConversation,
-            {
-              id: generateConversationId("system"),
-              time: new Date(),
-              author: "system",
-              content: error.message,
-              status: ConversationRequestStatus.ERROR,
-            },
-          ]);
-          sendLogEvent(null, {
-            ...logEvent,
-            status: ConversationRequestStatus.ERROR,
-            error: error.message,
-          });
-        }
-      } catch (error: any) {
-        const currentConversation = newConversation.pop() as Conversation;
-        sendErrorEvent(error, {
-          event: "request_new_conversation_error",
-          category: "request_new_conversation",
-          label: "error",
-          appName: "chatBox",
-          conversationId: currentConversation?.id,
-          conversationAuthor: currentConversation?.author,
-          conversationContent: currentConversation?.content,
-        });
-        setConversation([
-          ...newConversation,
-          { ...currentConversation, status: ConversationRequestStatus.FAILED },
-          {
-            id: generateConversationId("system"),
-            time: new Date(),
-            author: "system",
-            content: error.message,
-            status: ConversationRequestStatus.ERROR,
-          },
-        ]);
-      }
-    },
-    [requestConversation]
-  );
 
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
   }, []);
 
   const handleSubmit = useCallback(
-    (value: string) => {
-      const newContent = value.trim();
-      if (newContent.length === 0) return;
-      setConversation((prev) => [
-        ...prev,
-        {
-          id: generateConversationId("user"),
-          time: new Date(),
-          author: "user",
-          content: newContent,
-          status: ConversationRequestStatus.PROGRESSING,
-        },
-      ]);
-      setInputValue("");
-    },
-    [requestNewConversation]
-  );
-
-  useEffect(() => {
-    const onRequestConversation = async () => {
-      const newConversation = conversation[conversation.length - 1];
-      if (newConversation?.status === ConversationRequestStatus.PROGRESSING) {
-        await requestNewConversation([...conversation]);
+    async (value: string) => {
+      try {
+        const content = value.trim();
+        if (content.length === 0) return;
+        setInputValue("");
+        await sendMessage(content);
+        trackAction("request_conversation", {
+          label: ConversationStatus.SUCCESS,
+        });
+      } catch (error) {
+        trackError(error, { label: "error" });
       }
-    };
-    onRequestConversation();
-  }, [conversation]);
+    },
+    [sendMessage]
+  );
 
   const state = useMemo(
     () => ({
       state: {
         inputValue,
         currentSpeechText,
-        conversation,
+        conversations,
 
         isSpeaking,
         isProgressing,
@@ -174,7 +62,7 @@ export default function ChatBoxProvider({
     [
       inputValue,
       currentSpeechText,
-      conversation,
+      conversations,
       isSpeaking,
       isProgressing,
       isSupportSpeech,

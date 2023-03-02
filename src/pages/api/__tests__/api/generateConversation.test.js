@@ -28,7 +28,7 @@ describe.skip("Test generateConversation API", () => {
           {
             id: "user_1676892434372",
             time: new Date(),
-            author: "user",
+            role: "user",
             content: "Test content.",
             status: "processing",
           },

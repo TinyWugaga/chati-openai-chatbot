@@ -23,6 +23,9 @@
       "@/utils/*": [
         "src/utils/*"
       ],
+      "@/services/*": [
+        "src/services/*"
+      ],
       "@/apps/*": [
         "src/apps/*"
       ],

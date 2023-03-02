@@ -1,3 +1,5 @@
+const packageJson = require("./package.json");
+
 const prod = process.env.NODE_ENV === "production";
 
 const localhost = "http://localhost:3000/";
@@ -15,6 +17,7 @@ module.exports = {
   IS_PROD,
   LOCAL_DOMAIN: localhost,
   API_DOMAIN: apiDomain,
+  APP_VERSION: packageJson.version,
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,

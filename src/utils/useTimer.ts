@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 export default function useTimer() {
   const [time, setTime] = useState(0);
@@ -12,26 +12,26 @@ export default function useTimer() {
     };
   }, []);
 
-  const start = () => {
+  const start = useCallback(() => {
     setIsActive(true);
     setIsPaused(false);
     intervalRef.current = setInterval(() => {
       setTime((prevTime) => prevTime + 1);
     }, 1000);
-  };
+  }, []);
 
-  const pause = () => {
+  const pause = useCallback(() => {
     setIsActive(false);
     setIsPaused(true);
     clearInterval(intervalRef.current!);
-  };
+  }, []);
 
-  const stop = () => {
+  const stop = useCallback(() => {
     setTime(0);
     setIsActive(false);
     setIsPaused(false);
     clearInterval(intervalRef.current!);
-  };
+  }, []);
 
   return {
     time,
