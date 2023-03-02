@@ -1,4 +1,4 @@
-import generateConversationAPI from "@/pages/api/conversation/generate";
+import generateConversationAPI from "../conversation/generate";
 import { MOCK_CONVERSATIONS } from "@/utils/api/testUtils/conversations";
 
 jest.mock("@/lib/OpenAI");
