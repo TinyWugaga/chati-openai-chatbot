@@ -1,5 +1,3 @@
-import logger from "@/lib/logger";
-
 const DEFAULT_CONFIG = {
   lang: "en-US",
   interimResults: true, // If true return result instantly
