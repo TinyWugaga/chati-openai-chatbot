@@ -1,6 +1,6 @@
 const mockOpenAI = jest.fn(() => {
   return {
-    createConversation: async (content: string) => {
+    createConversation: async () => {
       return "This is a test conversation result";
     },
   };

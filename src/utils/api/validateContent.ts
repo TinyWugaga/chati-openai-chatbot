@@ -6,6 +6,6 @@ export default function validateContent(content: string) {
     "gi"
   );
   const isInvalid =
-    content.trim().length === 0 || content.match(sensitiveWordsReg);
+    !content || content.trim().length === 0 || content.match(sensitiveWordsReg);
   return !isInvalid;
 }

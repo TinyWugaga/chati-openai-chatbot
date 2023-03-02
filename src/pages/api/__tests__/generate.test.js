@@ -1,4 +1,5 @@
-import generateConversationAPI from "@/pages/api/generateConversation";
+import generateConversationAPI from "@/pages/api/conversation/generate";
+import { MOCK_CONVERSATIONS } from "@/utils/api/testUtils/conversations";
 
 jest.mock("@/lib/OpenAI");
 
@@ -20,19 +21,14 @@ const createMockRequestResponse = (body, handleResponse) => {
   };
 };
 
-describe.skip("Test generateConversation API", () => {
+describe("Test API conversation/generate", () => {
   test("Test response return 200", async () => {
     const { req, res } = createMockRequestResponse(
       {
-        conversations: [
-          {
-            id: "user_1676892434372",
-            time: new Date(),
-            role: "user",
-            content: "Test content.",
-            status: "processing",
-          },
-        ],
+        conversationId: `user_${new Date(2023, 1, 14, 0, 3, 0).valueOf()}`,
+        conversations: MOCK_CONVERSATIONS,
+        role: "user",
+        content: "I hate lovers holiday.",
       },
       (status) => checkStatus(status, 200)
     );
@@ -40,9 +36,8 @@ describe.skip("Test generateConversation API", () => {
   });
 
   test("Test response return 400", async () => {
-    const { req, res } = createMockRequestResponse(
-      { conversations: [] },
-      (status) => checkStatus(status, 400)
+    const { req, res } = createMockRequestResponse({}, (status) =>
+      checkStatus(status, 400)
     );
     await generateConversationAPI(req, res);
   });
@@ -50,11 +45,9 @@ describe.skip("Test generateConversation API", () => {
   test("Test response return 500", async () => {
     const { req, res } = createMockRequestResponse(
       {
-        conversations: [
-          () => {
-            throw new Error("test error");
-          },
-        ],
+        content: () => {
+          throw new Error("test error");
+        },
       },
       (status) => checkStatus(status, 500)
     );
