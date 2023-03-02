@@ -1,5 +1,4 @@
 import { ConversationGenerateAPIErrorType } from "@/types";
-import { generateErrorEventParams } from "./generateEventParams";
 
 export const CHATTING_AI_PROMPT = [
   "Your name is ChaTi.",
@@ -43,27 +42,3 @@ export const RequestTimeoutError = () => {
   requestTimeoutError.message = `The request is timeout.`;
   return requestTimeoutError;
 };
-
-// NotionLogger
-export const ApiEventLogger = (
-  api: string,
-  extra: Record<string, string> = {}
-) => ({
-  logger: `api/${api}`,
-  type: "log",
-  extra: JSON.stringify({ ...extra }),
-  url: process.env.API_DOMAIN,
-  version: process.env.APP_VERSION,
-});
-
-export const ApiErrorLogger = (
-  api: string,
-  error: any,
-  extra: Record<string, string> = {}
-) => ({
-  logger: `api/${api}`,
-  type: "error",
-  extra: JSON.stringify({ ...generateErrorEventParams(error), ...extra }),
-  url: process.env.API_DOMAIN,
-  version: process.env.APP_VERSION,
-});

@@ -60,12 +60,12 @@ class SpeechRecognition {
   _handleAudioStart() {
     this._isListening = true;
     this._recognition.addEventListener("speechstart", this._onSpeechStart);
-    logger.log("Start recording audio.");
+    console.log("Start recording audio.");
   }
 
   _handleSpeechStart() {
     this._recognition.addEventListener("result", this._onSpeechResult);
-    logger.log("Speech has been detected.");
+    console.log("Speech has been detected.");
   }
 
   _handleSpeechResult(e) {

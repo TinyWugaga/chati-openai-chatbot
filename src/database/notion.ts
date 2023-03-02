@@ -1,16 +1,16 @@
 import NotionDB from "@/lib/NotionDB";
-import {
-  NotionLogProperties,
-  generateNotionLogProperties,
-} from "@/utils/generateNotionProperties";
 
 import { NOTION_LOG_DB_ID } from "./constant";
+import {
+  NotionLogProperties,
+  generateLogDBProperties,
+} from "./utils/generateProperties";
 
-const database = new NotionDB();
+const LoggerDB = new NotionDB(NOTION_LOG_DB_ID);
 
 export default {
-  addLogEvent: async (properties: NotionLogProperties) => {
-    const logProperties = generateNotionLogProperties(properties);
-    return await database.updateDB(NOTION_LOG_DB_ID, logProperties);
+  addLog: async (properties: NotionLogProperties) => {
+    const logProperties = generateLogDBProperties(properties);
+    return await LoggerDB.addNewData(logProperties);
   },
 };

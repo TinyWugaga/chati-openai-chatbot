@@ -56,14 +56,13 @@ export function sendEvent(
     ...value,
   } as GoogleTagEventParams;
 
-  //TODO
   if (process.env.IS_PROD && gtag) {
     gtag("event", eventName, gtagParams);
   } else {
     if (category === "error") {
-      logger.error(null, gtagParams);
+      logger.error(eventName, gtagParams);
     } else {
-      logger.log(null, gtagParams);
+      // logger.log("GA Tracker", eventName, gtagParams);
     }
   }
 }

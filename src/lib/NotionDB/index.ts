@@ -2,8 +2,10 @@ import { Client } from "@notionhq/client";
 
 class NotionDB {
   _notionDB: Client | undefined;
+  _databaseId: string;
 
-  constructor() {
+  constructor(id: string) {
+    this._databaseId = id;
     this._init();
   }
 
@@ -15,12 +17,12 @@ class NotionDB {
     this._notionDB = db;
   }
 
-  async updateDB(id: string, properties: { [key: string]: any }) {
+  async addNewData(properties: { [key: string]: any }) {
     if (this._notionDB) {
       return await this._notionDB.pages.create({
         parent: {
           type: "database_id",
-          database_id: id,
+          database_id: this._databaseId,
         },
         properties,
       });

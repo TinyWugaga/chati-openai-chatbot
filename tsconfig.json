@@ -14,8 +14,8 @@
       "@/assets/*": [
         "src/assets/*"
       ],
-      "@/database/*": [
-        "src/database/*"
+      "@/database": [
+        "src/database/index.ts"
       ],
       "@/lib/*": [
         "src/lib/*"

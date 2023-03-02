@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import OpenAI from "@/lib/OpenAI/index";
-import notion from "@/database/notion";
+import OpenAI from "@/lib/OpenAI";
+import logger from "@/lib/logger";
 
 import validateContent from "@/utils/api/validateContent";
 import generateMessages from "@/utils/api/generateMessages";
@@ -10,8 +10,6 @@ import {
   RequestServiceError,
   OpenAIResponseError,
   // RequestTimeoutError,
-  ApiEventLogger,
-  ApiErrorLogger,
 } from "@/utils/constant";
 
 import { ConversationGenerateAPIRequestParams as RequestParams } from "@/types";
@@ -28,8 +26,7 @@ const handleError = (
     status: 400 | 500 | 504;
   }
 ) => {
-  // notion.addLogEvent(ApiErrorLogger("generateConversation", error));
-  console.error({ conversationId, error });
+  logger.error("api/conversation/generate", error, { conversationId, status });
   res.status(status).json({ conversationId: conversationId, error });
 };
 
@@ -52,6 +49,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const messages = generateMessages([...conversations, { role, content }]);
     const result = await openai.createConversation(messages);
 
+    logger.log("api/conversation/generate", "generate conversation success", {
+      conversationId,
+      ...result,
+    });
     res.status(200).json({ conversationId, result });
   } catch (error: any) {
     const errorResponse = error.response;
