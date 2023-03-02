@@ -2,6 +2,7 @@ import generateConversationAPI from "@/pages/api/conversation/generate";
 import { MOCK_CONVERSATIONS } from "@/utils/api/testUtils/conversations";
 
 jest.mock("@/lib/OpenAI");
+jest.mock("@/lib/logger");
 
 const checkStatus = jest.fn((status, expectedStatus) => {
   expect(status).toEqual(expectedStatus);
