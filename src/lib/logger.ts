@@ -18,7 +18,7 @@ export const consoleError = (error: any, params: customParams = {}) =>
   });
 
 const logger = {
-  log: (logger: string, message: string, extra = {}) => {
+  log: async (logger: string, message: string, extra = {}) => {
     if (!(process.env.IS_PROD || process.env.ON_TRACK)) {
       consoleLog(message, {
         logger,
@@ -26,10 +26,10 @@ const logger = {
       });
     } else {
       const log = NotionLogger(logger, { message, ...extra });
-      notionDB.addLog(log);
+      await notionDB.addLog(log);
     }
   },
-  error: (logger: string, error: any, extra = {}) => {
+  error: async (logger: string, error: any, extra = {}) => {
     if (!(process.env.IS_PROD || process.env.ON_TRACK)) {
       consoleError(error, {
         logger,
@@ -37,7 +37,7 @@ const logger = {
       });
     } else {
       const errorLog = NotionErrorLogger(logger, error);
-      notionDB.addLog(errorLog);
+      await notionDB.addLog(errorLog);
     }
   },
 };

@@ -14,7 +14,7 @@ import {
 
 import { ConversationGenerateAPIRequestParams as RequestParams } from "@/types";
 
-const handleError = (
+const handleError = async (
   res: NextApiResponse,
   {
     conversationId,
@@ -26,7 +26,14 @@ const handleError = (
     status: 400 | 500 | 504;
   }
 ) => {
-  logger.error("api/conversation/generate", error, { conversationId, status });
+  try {
+    await logger.error("api/conversation/generate", error, {
+      conversationId,
+      status,
+    });
+  } catch (error) {
+    res.status(status).json({ conversationId: conversationId, error });
+  }
   res.status(status).json({ conversationId: conversationId, error });
 };
 
@@ -52,10 +59,14 @@ export default async function ConversationGenerateAPI(
     const messages = generateMessages([...conversations, { role, content }]);
     const result = await openai.createConversation(messages);
 
-    logger.log("api/conversation/generate", "generate conversation success", {
-      conversationId,
-      ...result,
-    });
+    await logger.log(
+      "api/conversation/generate",
+      "generate conversation success",
+      {
+        conversationId,
+        ...result,
+      }
+    );
     res.status(200).json({ conversationId, result });
   } catch (error: any) {
     const errorResponse = error.response;
