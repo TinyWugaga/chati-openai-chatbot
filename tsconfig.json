@@ -14,11 +14,17 @@
       "@/assets/*": [
         "src/assets/*"
       ],
+      "@/database": [
+        "src/database/index.ts"
+      ],
       "@/lib/*": [
         "src/lib/*"
       ],
       "@/utils/*": [
         "src/utils/*"
+      ],
+      "@/services/*": [
+        "src/services/*"
       ],
       "@/apps/*": [
         "src/apps/*"
@@ -52,11 +58,12 @@
   "include": [
     "next-env.d.ts",
     "src/global.d.ts",
-    "src/lib/OpenAI.d.ts",
+    "src/lib/*.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "__tests__"
   ],
 }

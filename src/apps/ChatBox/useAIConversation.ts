@@ -1,72 +1,138 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import {
   Conversation,
-  GenerateConversationAPIResult,
-  GenerateConversationAPIError,
+  ConversationStatus,
+  ConversationGenerateAPIRequestParams as RequestParams,
+  ConversationGenerateAPIResultResponse as ResultResponse,
 } from "@/types";
+import { generateConversation } from "@/services/conversation";
+import useTimer from "@/utils/useTimer";
+import { trackConversation } from "@/lib/tracker";
+import {
+  generateConversationId,
+  handleConversationErrorMessage,
+} from "./utils";
 
 export default function useAIConversation() {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isProgressing, setIsProgressing] = useState(false);
-  const [loadingTime, setLoadingTime] = useState(0);
 
-  const fetchGenerateConversationAPI = useCallback(
-    async (
-      conversations: Conversation[]
-    ): Promise<
-      GenerateConversationAPIResult | GenerateConversationAPIError
-    > => {
-      let stopTimer = false;
-      const loadingTimeInterval = setInterval(() => {
-        if (!stopTimer) {
-          setLoadingTime((time) => time + 1);
-        } else {
-          clearInterval(loadingTimeInterval);
-        }
-      }, 500);
+  const { time, start, stop } = useTimer();
 
-      const result = await fetch("/api/generateConversation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ conversations }),
-      })
-        .then((response) => response.json())
-        .catch((error) => error);
-
-      if (result) {
-        stopTimer = true;
-        setLoadingTime(0);
-      }
-      return result;
+  const handleConversationResponse = useCallback(
+    ({
+      status,
+      conversationId,
+      result,
+    }: ResultResponse & { status: ConversationStatus }) => {
+      setConversations((prevConversations) => {
+        const conversationIndex = prevConversations.findIndex(
+          ({ id }) => id === conversationId
+        );
+        return [
+          ...prevConversations.slice(0, conversationIndex),
+          { ...prevConversations[conversationIndex], status },
+          ...prevConversations.slice(conversationIndex + 1),
+          {
+            id: generateConversationId("assistant"),
+            time: new Date(),
+            ...result,
+            status,
+          },
+        ];
+      });
     },
     []
   );
 
-  const requestConversation = useCallback(
-    async (newConversations: Conversation[]) => {
-      try {
-        setIsProgressing(true);
-        const response = await fetchGenerateConversationAPI(newConversations);
-        setIsProgressing(false);
+  const fetchGenerateConversation = useCallback(
+    async (params: Omit<RequestParams, "conversations">): Promise<void> => {
+      start();
+      const response = await generateConversation({
+        ...params,
+        conversations,
+      });
+      response && stop();
 
-        return {
-          error: undefined,
-          result: "",
-          ...response,
-        };
+      const { result, error } = response;
+      if (result) {
+        handleConversationResponse({
+          conversationId: params.conversationId,
+          result,
+          status: ConversationStatus.SUCCESS,
+        });
+        trackConversation("request_conversation", {
+          label: ConversationStatus.SUCCESS,
+          conversationId: params.conversationId,
+          content: params.content,
+        });
+      }
+      if (error) {
+        handleConversationResponse({
+          conversationId: params.conversationId,
+          result: {
+            role: "assistant",
+            content: handleConversationErrorMessage(response.status),
+          },
+          status: ConversationStatus.SUCCESS,
+        });
+        trackConversation("request_conversation", {
+          label: ConversationStatus.FAILED,
+          conversationId: params.conversationId,
+          content: params.content,
+        });
+      }
+    },
+    [start, stop, conversations, handleConversationResponse]
+  );
+
+  const sendMessage = useCallback(async (content: string) => {
+    const conversationId = generateConversationId("user");
+    setConversations((prevConversation) => [
+      ...prevConversation,
+      {
+        id: conversationId,
+        time: new Date(),
+        role: "user",
+        content,
+        status: ConversationStatus.PROGRESSING,
+      },
+    ]);
+  }, []);
+
+  const requestConversation = useCallback(
+    async (conversation: Conversation) => {
+      try {
+        const { id: conversationId, role, content } = conversation;
+        setIsProgressing(true);
+        await fetchGenerateConversation({
+          conversationId,
+          role,
+          content,
+        });
+        setIsProgressing(false);
       } catch (error: any) {
         setIsProgressing(false);
         throw error;
       }
     },
-    [fetchGenerateConversationAPI]
+    [fetchGenerateConversation]
   );
+
+  useEffect(() => {
+    const progressingConversation = conversations.find(
+      ({ status }) => status === ConversationStatus.PROGRESSING
+    );
+    if (progressingConversation) {
+      requestConversation(progressingConversation);
+    }
+  }, [conversations, requestConversation]);
 
   return {
     isProgressing,
-    loadingTime,
-    requestConversation,
+    loadingTime: time,
+    conversations,
+    sendMessage,
   };
 }

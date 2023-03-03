@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useRef, useEffect } from "react";
 import styled, { keyframes, css } from "styled-components";
 
 import { mediaQueryScreen } from "@/assets/styles/mixin";
@@ -14,14 +14,15 @@ export default function SpeechBubble({
   isLoading?: boolean;
   container?: HTMLDivElement | null;
 }) {
+  const bubbleContainer = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (container) {
-      container.scrollTo(0, container.scrollHeight);
+    if (bubbleContainer.current) {
+      bubbleContainer.current.scrollIntoView();
     }
   }, [container]);
 
   return (
-    <BubbleContainer>
+    <BubbleContainer ref={bubbleContainer}>
       <Bubble direction={direction}>
         <BubbleTextWrapper isLoading={isLoading}>{text}</BubbleTextWrapper>
       </Bubble>
@@ -124,6 +125,7 @@ const LoadingCSS = css`
 
 const BubbleTextWrapper = styled.p<{ isLoading: boolean }>`
   font-size: 1rem;
+  word-break: break-all;
 
   ${({ isLoading }) => (isLoading ? LoadingCSS : "")};
 `;

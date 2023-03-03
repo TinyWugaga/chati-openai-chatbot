@@ -1,22 +1,8 @@
-export enum ConversationRequestStatus {
-  PROGRESSING = "progressing",
-  FINISHED = "finished",
-  SUCCESS = "success",
-  ERROR = "error",
-}
-
-export interface Conversation {
-  id: string;
-  time: Date;
-  author: string;
-  content: string;
-  status: ConversationRequestStatus;
-}
-
+import { Conversation } from "./conversation";
 export interface ChatBoxState {
   inputValue: string;
   currentSpeechText: string;
-  conversation: Conversation[];
+  conversations: Conversation[];
 
   isSpeaking: boolean;
   isProgressing: boolean;

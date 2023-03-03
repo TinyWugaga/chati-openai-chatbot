@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import styled from "styled-components";
 
-import { sendLogEvent } from "@/lib/googleAnalytics";
+import { trackAction } from "@/lib/tracker";
 
 import { useChatBox } from "@/apps/ChatBox";
 
@@ -21,7 +21,7 @@ export default function ChatBox() {
     state: {
       inputValue,
       currentSpeechText,
-      conversation,
+      conversations,
 
       isSpeaking,
       isProgressing,
@@ -69,11 +69,11 @@ export default function ChatBox() {
       </ChatBoxHeader>
       <ChatBoxContent>
         <ChatBoxContentContainer ref={ChatBoxContentContainerRef}>
-          {conversation?.map(({ id, author, content }) => (
+          {conversations?.map(({ id, role, content }) => (
             <SpeechBubble
               key={`conversation_${id}`}
               container={ChatBoxContentContainerRef.current}
-              direction={author === "user" ? "right" : "left"}
+              direction={role === "user" ? "right" : "left"}
               text={content}
             />
           ))}
@@ -103,9 +103,7 @@ export default function ChatBox() {
           <ChatBoxSendButtonWrapper>
             <SendButton
               onClick={() => {
-                sendLogEvent(null, {
-                  event: "click_send_button",
-                  category: "action",
+                trackAction("click_send_button", {
                   label: "click",
                   element: "send_button",
                 });
@@ -119,9 +117,7 @@ export default function ChatBox() {
         {isSupportSpeech && (
           <SpeechButton
             onClick={() => {
-              sendLogEvent(null, {
-                event: "click_speech_button",
-                category: "action",
+              trackAction("click_speech_button", {
                 label: "click",
                 element: "speech_button",
               });

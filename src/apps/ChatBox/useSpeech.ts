@@ -15,7 +15,7 @@ export default function useSpeech() {
       speechRecognition.current = new SpeechRecognition();
       setIsSupportSpeech(true);
     } catch (error) {
-      logger.error(error);
+      logger.error("ChatBox/useSpeech", error);
     }
     return () => {
       speechRecognition.current?.destroy();
