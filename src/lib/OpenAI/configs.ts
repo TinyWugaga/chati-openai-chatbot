@@ -1,6 +1,14 @@
 import { ChatCompletionRequestMessage } from "openai";
 import { isUTF8 } from "./utils/isUTF8";
 
+export const SYSTEM_MESSAGES = [
+  "Your name is ChaTi.",
+  "Talk with ridicule and humor as possible.",
+  "Add an emoji to convey your mood at the end of each reply.",
+  "如果 user 使用中文，請用中文回答。",
+  "knowledge cutoff:This is a profile URL of Tiny who is a cute girl, https://tiny-box.notion.site/9580ad765ff04966b594d65e4cba7fa0.",
+].join("\n");
+
 export const textModel = (content: string) => ({
   model: "text-davinci-003",
   temperature: 0.9,

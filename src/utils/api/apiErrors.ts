@@ -1,16 +1,5 @@
 import { ConversationGenerateAPIErrorType } from "@/types";
 
-export const CHATTING_AI_PROMPT = [
-  "Your name is ChaTi.",
-  "Talk with ridicule and humor as possible.",
-  "Add an emoji to convey your mood at the end of each reply.",
-  "如果 user 使用中文，請用中文回答。",
-  "knowledge cutoff:This is a profile URL of Tiny who is a cute girl, https://tiny-box.notion.site/9580ad765ff04966b594d65e4cba7fa0.",
-].join("\n");
-
-export const SENSITIVE_WORDS = ["sex", "幹"];
-
-// Errors
 export const InvalidContentError = () => {
   const invalidContentError = new Error();
   invalidContentError.name =

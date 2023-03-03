@@ -1,16 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import OpenAI from "@/lib/OpenAI";
+import generateMessages from "@/lib/OpenAI/utils/generateMessages";
 import logger from "@/lib/logger";
 
 import validateContent from "@/utils/api/validateContent";
-import generateMessages from "@/utils/api/generateMessages";
 import {
   InvalidContentError,
   RequestServiceError,
   OpenAIResponseError,
   // RequestTimeoutError,
-} from "@/utils/constant";
+} from "@/utils/api/apiErrors";
 
 import { ConversationGenerateAPIRequestParams as RequestParams } from "@/types";
 

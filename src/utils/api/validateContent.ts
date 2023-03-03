@@ -1,4 +1,4 @@
-import { SENSITIVE_WORDS } from "../constant";
+import { SENSITIVE_WORDS } from "./constant";
 
 export default function validateContent(content: string) {
   const sensitiveWordsReg = new RegExp(

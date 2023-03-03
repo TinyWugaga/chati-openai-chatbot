@@ -1,6 +1,6 @@
 import { ChatCompletionResponseMessage } from "openai";
 
-import { CHATTING_AI_PROMPT } from "../constant";
+import { SYSTEM_MESSAGES } from "../configs";
 import { Conversation } from "@/types";
 
 export default function generateMessages(
@@ -14,5 +14,5 @@ export default function generateMessages(
       content,
     }));
 
-  return [{ role: "system", content: CHATTING_AI_PROMPT }, ...messages];
+  return [{ role: "system", content: SYSTEM_MESSAGES }, ...messages];
 }

@@ -3,7 +3,8 @@ const packageJson = require("./package.json");
 const prod = process.env.NODE_ENV === "production";
 
 const localhost = "http://localhost:3000/";
-const apiDomain = prod ? process.env.NEXT_PUBLIC_VERCEL_URL : localhost;
+const apiDomain = prod ? process.env.VERCEL_URL : localhost;
+const previewDomain = process.env.NEXT_PUBLIC_VERCEL_URL;
 
 const IS_DEV =
   process.env.NODE_ENV === "development" ||
@@ -18,7 +19,7 @@ module.exports = {
   IS_PROD,
   ON_TRACK,
   LOCAL_DOMAIN: localhost,
-  API_DOMAIN: apiDomain,
+  API_DOMAIN: IS_PREVIEW ? previewDomain : apiDomain,
   APP_VERSION: packageJson.version,
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
