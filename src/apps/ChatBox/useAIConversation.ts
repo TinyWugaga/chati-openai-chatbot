@@ -8,6 +8,7 @@ import {
 } from "@/types";
 import { generateConversation } from "@/services/conversation";
 import useTimer from "@/utils/useTimer";
+import { trackConversation } from "@/lib/tracker";
 import {
   generateConversationId,
   handleConversationErrorMessage,
@@ -61,6 +62,11 @@ export default function useAIConversation() {
           result,
           status: ConversationStatus.SUCCESS,
         });
+        trackConversation("request_conversation", {
+          label: ConversationStatus.SUCCESS,
+          conversationId: params.conversationId,
+          content: params.content,
+        });
       }
       if (error) {
         handleConversationResponse({
@@ -70,6 +76,11 @@ export default function useAIConversation() {
             content: handleConversationErrorMessage(response.status),
           },
           status: ConversationStatus.SUCCESS,
+        });
+        trackConversation("request_conversation", {
+          label: ConversationStatus.FAILED,
+          conversationId: params.conversationId,
+          content: params.content,
         });
       }
     },

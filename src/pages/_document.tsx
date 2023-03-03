@@ -43,9 +43,9 @@ export default class Document extends NextDocument {
                 gtag('config', '${process.env.GOOGLE_ANALYTICS}', {
                   page_path: window.location.pathname
                   ${
-                    (!process.env.IS_PROD &&
-                      ",debug_event: 1,traffic_type : 'internal'") ||
-                    ""
+                    !process.env.IS_PROD
+                      ? ",debug_event: 1,traffic_type : 'internal'"
+                      : ""
                   }
                 });
               `,

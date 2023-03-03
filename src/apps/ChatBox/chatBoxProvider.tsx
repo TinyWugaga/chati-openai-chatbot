@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback, PropsWithChildren } from "react";
 
-import { ConversationStatus } from "@/types";
-import { trackAction, trackError } from "@/lib/tracker";
+import { trackError } from "@/lib/tracker";
 
 import Context from "./context";
 
@@ -29,9 +28,6 @@ export default function ChatBoxProvider({
         if (content.length === 0) return;
         setInputValue("");
         await sendMessage(content);
-        trackAction("request_conversation", {
-          label: ConversationStatus.SUCCESS,
-        });
       } catch (error) {
         trackError(error, { label: "error" });
       }

@@ -1,18 +1,24 @@
 import logger from "./logger";
 import { generateErrorEventParams } from "@/utils/generateEventParams";
 
+import { ConversationStatus } from "@/types";
+
 interface EventParams {
   name: string;
   category: string;
   version: string;
 }
-
 interface ActionEventParams {
   category: "action";
   label?: string;
   element?: string;
 }
-
+interface ConversationEventParams {
+  category: "conversation";
+  label: Omit<ConversationStatus, "progressing">;
+  conversationId: string;
+  content: string;
+}
 interface ErrorEventParams {
   category: "error";
   label?: string;
@@ -22,7 +28,7 @@ interface ErrorEventParams {
 }
 
 type GoogleTagEventParams = EventParams &
-  (ActionEventParams | ErrorEventParams);
+  (ActionEventParams | ConversationEventParams | ErrorEventParams);
 
 export function trackAction(
   actionName: string,
@@ -33,7 +39,15 @@ export function trackAction(
     ...params,
   });
 }
-
+export function trackConversation(
+  actionName: string,
+  params: Omit<ConversationEventParams, "category">
+) {
+  sendEvent(actionName, {
+    category: "conversation",
+    ...params,
+  });
+}
 export function trackError(error: any, params: { label?: string }) {
   sendEvent("track_error", {
     category: "error",
@@ -44,7 +58,7 @@ export function trackError(error: any, params: { label?: string }) {
 
 export function sendEvent(
   eventName: string,
-  params: ActionEventParams | ErrorEventParams
+  params: ActionEventParams | ConversationEventParams | ErrorEventParams
 ) {
   const gtag = typeof window !== "undefined" && window.gtag;
   const { category, label, ...value } = params;
