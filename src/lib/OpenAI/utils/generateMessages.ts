@@ -6,7 +6,12 @@ import { Conversation } from "@/types";
 export default function generateMessages(
   conversation: Conversation[] | ChatCompletionResponseMessage[]
 ): ChatCompletionResponseMessage[] {
-  // TODO: add sort
+  const systemMessages = SYSTEM_MESSAGES.map<ChatCompletionResponseMessage>(
+    (content) => ({
+      role: "system",
+      content,
+    })
+  );
   const messages = conversation
     .filter(({ role }) => ["user", "assistant"].includes(role))
     .map<ChatCompletionResponseMessage>(({ role, content }) => ({
@@ -14,5 +19,5 @@ export default function generateMessages(
       content,
     }));
 
-  return [{ role: "system", content: SYSTEM_MESSAGES }, ...messages];
+  return [...systemMessages, ...messages];
 }
