@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["plugin:@next/next/recommended"],
+  extends: ["next/core-web-vitals"],
   env: {
     node: true,
     browser: true,

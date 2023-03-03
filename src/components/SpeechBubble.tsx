@@ -125,6 +125,7 @@ const LoadingCSS = css`
 
 const BubbleTextWrapper = styled.p<{ isLoading: boolean }>`
   font-size: 1rem;
+  word-break: break-all;
 
   ${({ isLoading }) => (isLoading ? LoadingCSS : "")};
 `;

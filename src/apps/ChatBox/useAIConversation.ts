@@ -73,25 +73,22 @@ export default function useAIConversation() {
         });
       }
     },
-    [stop, handleConversationResponse]
+    [start, stop, conversations, handleConversationResponse]
   );
 
-  const sendMessage = useCallback(
-    async (content: string) => {
-      const conversationId = generateConversationId("user");
-      setConversations((prevConversation) => [
-        ...prevConversation,
-        {
-          id: conversationId,
-          time: new Date(),
-          role: "user",
-          content,
-          status: ConversationStatus.PROGRESSING,
-        },
-      ]);
-    },
-    [fetchGenerateConversation]
-  );
+  const sendMessage = useCallback(async (content: string) => {
+    const conversationId = generateConversationId("user");
+    setConversations((prevConversation) => [
+      ...prevConversation,
+      {
+        id: conversationId,
+        time: new Date(),
+        role: "user",
+        content,
+        status: ConversationStatus.PROGRESSING,
+      },
+    ]);
+  }, []);
 
   const requestConversation = useCallback(
     async (conversation: Conversation) => {

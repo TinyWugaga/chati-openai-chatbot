@@ -30,7 +30,10 @@ const handleError = (
   res.status(status).json({ conversationId: conversationId, error });
 };
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function ConversationGenerateAPI(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const { conversationId, conversations, role, content } =
     req.body as RequestParams;
 

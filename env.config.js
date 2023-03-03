@@ -10,11 +10,13 @@ const IS_DEV =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "development";
 const IS_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 const IS_PROD = prod && !IS_PREVIEW;
+const ON_TRACK = process.env.TRACK || IS_PREVIEW;
 
 module.exports = {
   IS_DEV,
   IS_PREVIEW,
   IS_PROD,
+  ON_TRACK,
   LOCAL_DOMAIN: localhost,
   API_DOMAIN: apiDomain,
   APP_VERSION: packageJson.version,

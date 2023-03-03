@@ -13,5 +13,7 @@ export const textModel = (content: string) => ({
 
 export const chatModel = (messages: ChatCompletionRequestMessage[]) => ({
   model: "gpt-3.5-turbo",
+  temperature: 1.1,
+  frequency_penalty: 0.8,
   messages,
 });

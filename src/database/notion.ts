@@ -8,9 +8,11 @@ import {
 
 const LoggerDB = new NotionDB(NOTION_LOG_DB_ID);
 
-export default {
+const notionDB = {
   addLog: async (properties: NotionLogProperties) => {
     const logProperties = generateLogDBProperties(properties);
     return await LoggerDB.addNewData(logProperties);
   },
 };
+
+export default notionDB;
