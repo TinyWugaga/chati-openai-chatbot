@@ -19,7 +19,7 @@ export default async function ConversationGenerateAPI(
 
     const { events } = body;
 
-    await Promise.all(
+    const eventResult = await Promise.all(
       events.map(async (event) => {
         if (event.type === "message") {
           const { message, source, replyToken } = event;
@@ -39,12 +39,16 @@ export default async function ConversationGenerateAPI(
                 type: "text",
                 text: result.content,
               });
-              await logger.log("api/lineapp", "response new message.", {
+              await logger.log("api/lineapp", "Chat with user", {
                 userId,
                 content: message.text,
                 reply: result.content,
               });
             } catch (error) {
+              await LinebotClient.replyMessage(replyToken, {
+                type: "text",
+                text: "Sorry, I can not reply your message now, maybe you can try it again.",
+              });
               await logger.error("api/lineapp", error, {
                 userId,
                 content: message.text,
@@ -55,7 +59,7 @@ export default async function ConversationGenerateAPI(
       })
     );
 
-    return res.status(200).json({});
+    return res.status(200).json(eventResult);
   }
 
   return res.status(200);
