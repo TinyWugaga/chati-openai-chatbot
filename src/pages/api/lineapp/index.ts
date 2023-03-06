@@ -39,13 +39,14 @@ export default async function ConversationGenerateAPI(
               text: result.content,
             });
             await logger.log("api/lineapp", "response new message.", {
-              message,
               userId,
+              content: message.text,
+              reply: result.content,
             });
           } catch (error) {
             await logger.error("api/lineapp", error, {
-              message,
               userId,
+              content: message.text,
             });
           }
         }
