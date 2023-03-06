@@ -1,5 +1,5 @@
 import Crypto from "crypto";
-import { Client, MessageEvent } from "@line/bot-sdk";
+import { Client } from "@line/bot-sdk";
 
 const CHANNEL_TOKEN = process.env.LINE_CHANNEL_TOKEN as string;
 const CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET as string;
