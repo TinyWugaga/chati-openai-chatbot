@@ -1,4 +1,9 @@
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
+import {
+  ChatCompletionRequestMessage,
+  ChatCompletionResponseMessage,
+  Configuration,
+  OpenAIApi,
+} from "openai";
 
 import { OpenAIErrorTypes } from "./types";
 import { chatModel } from "./configs";
@@ -22,15 +27,23 @@ class OpenAI {
     this._openAI = new OpenAIApi(configuration);
   }
 
-  async createConversation(messages: ChatCompletionRequestMessage[]) {
+  async createConversation(
+    messages: ChatCompletionRequestMessage[],
+    user: string
+  ): Promise<ChatCompletionResponseMessage> {
     try {
       if (!this._openAI) throw new UndefinedOpenAIError();
 
       const completion = await this._openAI.createChatCompletion(
-        chatModel(messages)
+        chatModel(messages, user)
       );
 
-      return completion.data.choices[0].message;
+      return (
+        completion.data.choices[0].message || {
+          role: "assistant",
+          content: "",
+        }
+      );
     } catch (error: any) {
       // API Error Code Doc: https://platform.openai.com/docs/guides/error-codes/api-errors
       throw new OpenAIError(error.message);

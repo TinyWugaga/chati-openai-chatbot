@@ -57,7 +57,7 @@ export default async function ConversationGenerateAPI(
     }
 
     const messages = generateMessages([...conversations, { role, content }]);
-    const result = await openai.createConversation(messages);
+    const result = await openai.createConversation(messages, "guest");
 
     await logger.log(
       "api/conversation/generate",

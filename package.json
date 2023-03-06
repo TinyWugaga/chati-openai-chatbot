@@ -12,6 +12,7 @@
     "test:ci": "jest --ci"
   },
   "dependencies": {
+    "@line/bot-sdk": "^7.5.2",
     "@notionhq/client": "^2.2.3",
     "next": "latest",
     "openai": "latest",
