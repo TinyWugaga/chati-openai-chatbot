@@ -24,8 +24,8 @@ export const chatModel = (
   user?: string
 ) => ({
   model: "gpt-3.5-turbo",
-  temperature: 1.1,
-  frequency_penalty: 1.2,
+  temperature: 0.7,
+  frequency_penalty: 0.5,
   messages,
   ...(user ? { user } : {}),
 });
