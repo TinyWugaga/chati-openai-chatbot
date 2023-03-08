@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 import SpeechRecognition from "@/lib/SpeechRecognition";
-import logger from "@/lib/logger";
+import { logger } from "@/lib/logger";
 
 export default function useSpeech() {
   const [currentSpeechText, setCurrentSpeechText] = useState("");

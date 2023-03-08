@@ -16,3 +16,11 @@ export enum ConversationStatus {
 export interface Conversation extends Message {
   status: ConversationStatus;
 }
+
+export interface ConversationLog {
+  conversationId: string;
+  userId: string;
+  content: string;
+  result?: string;
+  status: ConversationStatus;
+}

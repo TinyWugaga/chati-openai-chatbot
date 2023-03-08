@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import OpenAI from "@/lib/OpenAI";
 import generateMessages from "@/lib/OpenAI/utils/generateMessages";
-import logger from "@/lib/logger";
+import { logger, conversationLogger } from "@/lib/logger";
 
 import validateContent from "@/utils/api/validateContent";
 import {
@@ -12,7 +12,10 @@ import {
   // RequestTimeoutError,
 } from "@/utils/api/apiErrors";
 
-import { ConversationGenerateAPIRequestParams as RequestParams } from "@/types";
+import {
+  ConversationStatus,
+  ConversationGenerateAPIRequestParams as RequestParams,
+} from "@/types";
 
 const handleError = async (
   res: NextApiResponse,
@@ -26,14 +29,15 @@ const handleError = async (
     status: 400 | 500 | 504;
   }
 ) => {
-  try {
-    await logger.error("api/conversation/generate", error, {
-      conversationId,
-      status,
-    });
-  } catch (error) {
-    res.status(status).json({ conversationId: conversationId, error });
-  }
+  await logger.error("api/conversation/generate", error, {
+    conversationId,
+    status,
+  });
+  await conversationLogger.update({
+    conversationId,
+    result: `${error.name}:${error.message}`,
+    status: ConversationStatus.FAILED,
+  });
   res.status(status).json({ conversationId: conversationId, error });
 };
 
@@ -41,12 +45,19 @@ export default async function ConversationGenerateAPI(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { conversationId, conversations, role, content } =
+  const { conversationId, conversations, userId, role, content } =
     req.body as RequestParams;
 
   const openai = new OpenAI();
 
   try {
+    await conversationLogger.add({
+      conversationId,
+      userId,
+      content,
+      status: ConversationStatus.PROGRESSING,
+    });
+
     if (!conversationId || !validateContent(content)) {
       handleError(res, {
         conversationId,
@@ -67,6 +78,12 @@ export default async function ConversationGenerateAPI(
         ...result,
       }
     );
+    await conversationLogger.update({
+      conversationId,
+      result: result?.content || "",
+      status: ConversationStatus.SUCCESS,
+    });
+
     res.status(200).json({ conversationId, result });
   } catch (error: any) {
     const errorResponse = error.response;

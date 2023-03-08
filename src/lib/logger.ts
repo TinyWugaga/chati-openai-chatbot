@@ -1,5 +1,12 @@
-import { notionDB, NotionLogger, NotionErrorLogger } from "@/database";
 import { generateErrorEventParams } from "@/utils/generateEventParams";
+
+import {
+  notionDB,
+  NotionLogger,
+  NotionErrorLogger,
+  NotionConversationLog,
+} from "@/database";
+import { ConversationLog } from "@/types";
 
 interface customParams {
   [key: string]: any;
@@ -17,7 +24,7 @@ export const consoleError = (error: any, params: customParams = {}) =>
     ...params,
   });
 
-const logger = {
+export const logger = {
   log: async (logger: string, message: string, extra = {}) => {
     if (!(process.env.IS_PROD || process.env.ON_TRACK)) {
       consoleLog(message, {
@@ -42,4 +49,15 @@ const logger = {
   },
 };
 
-export default logger;
+export const conversationLogger = {
+  add: async (properties: ConversationLog) => {
+    const conversationLog = NotionConversationLog(properties);
+    await notionDB.addConversationLog(conversationLog);
+  },
+  update: async (properties: Partial<ConversationLog>) => {
+    const { conversationId, ...updateProperties } = properties;
+    if (conversationId) {
+      await notionDB.updateConversationLog(conversationId, updateProperties);
+    }
+  },
+};

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 import {
   Conversation,
@@ -7,8 +7,10 @@ import {
   ConversationGenerateAPIResultResponse as ResultResponse,
 } from "@/types";
 import { generateConversation } from "@/services/conversation";
-import useTimer from "@/utils/useTimer";
+
 import { trackConversation } from "@/lib/tracker";
+
+import useTimer from "@/utils/useTimer";
 import {
   generateConversationId,
   handleConversationErrorMessage,
@@ -17,6 +19,7 @@ import {
 export default function useAIConversation() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isProgressing, setIsProgressing] = useState(false);
+  const userId = useRef(`guest_${new Date().valueOf}`);
 
   const { time, start, stop } = useTimer();
 
@@ -109,6 +112,7 @@ export default function useAIConversation() {
         await fetchGenerateConversation({
           conversationId,
           role,
+          userId: userId.current,
           content,
         });
         setIsProgressing(false);

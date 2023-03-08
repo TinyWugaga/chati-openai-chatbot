@@ -13,6 +13,7 @@ export enum ConversationGenerateAPIErrorType {
 
 export interface ConversationGenerateAPIRequestParams {
   conversationId: string;
+  userId: string;
   conversations: Conversation[];
   role: ChatCompletionResponseMessageRoleEnum;
   content: string;
