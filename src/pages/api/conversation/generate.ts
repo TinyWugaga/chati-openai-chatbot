@@ -29,16 +29,18 @@ const handleError = async (
     status: 400 | 500 | 504;
   }
 ) => {
+  await Promise.all([
+    logger.error("api/conversation/generate", error, {
+      conversationId,
+      status,
+    }),
+    conversationLogger.update({
+      conversationId,
+      result: `${error.name}:${error.message}`,
+      status: ConversationStatus.FAILED,
+    }),
+  ]);
   res.status(status).json({ conversationId: conversationId, error });
-  await logger.error("api/conversation/generate", error, {
-    conversationId,
-    status,
-  });
-  await conversationLogger.update({
-    conversationId,
-    result: `${error.name}:${error.message}`,
-    status: ConversationStatus.FAILED,
-  });
 };
 
 export default async function ConversationGenerateAPI(
@@ -71,20 +73,22 @@ export default async function ConversationGenerateAPI(
       const messages = generateMessages([...conversations, { role, content }]);
       const result = await openai.createConversation(messages);
 
-      res.status(200).json({ conversationId, result });
-
-      await logger.log(
-        "api/conversation/generate",
-        "generate conversation success",
-        {
+      await Promise.all([
+        logger.log(
+          "api/conversation/generate",
+          "generate conversation success",
+          {
+            conversationId,
+          }
+        ),
+        conversationLogger.update({
           conversationId,
-        }
-      );
-      await conversationLogger.update({
-        conversationId,
-        result: result?.content || "",
-        status: ConversationStatus.SUCCESS,
-      });
+          result: result?.content || "",
+          status: ConversationStatus.SUCCESS,
+        }),
+      ]);
+
+      res.status(200).json({ conversationId, result });
     } catch (error: any) {
       const errorResponse = error.response;
       if (errorResponse) {
