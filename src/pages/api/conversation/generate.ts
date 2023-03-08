@@ -73,20 +73,11 @@ export default async function ConversationGenerateAPI(
       const messages = generateMessages([...conversations, { role, content }]);
       const result = await openai.createConversation(messages);
 
-      await Promise.all([
-        logger.log(
-          "api/conversation/generate",
-          "generate conversation success",
-          {
-            conversationId,
-          }
-        ),
-        conversationLogger.update({
-          conversationId,
-          result: result?.content || "",
-          status: ConversationStatus.SUCCESS,
-        }),
-      ]);
+      await conversationLogger.update({
+        conversationId,
+        result: result?.content || "",
+        status: ConversationStatus.SUCCESS,
+      });
 
       res.status(200).json({ conversationId, result });
     } catch (error: any) {
