@@ -1,4 +1,4 @@
-import logger from "./logger";
+import { logger } from "./logger";
 import { generateErrorEventParams } from "@/utils/generateEventParams";
 
 import { ConversationStatus } from "@/types";
