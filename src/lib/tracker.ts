@@ -18,6 +18,7 @@ interface ConversationEventParams {
   label: Omit<ConversationStatus, "progressing">;
   conversationId: string;
   content: string;
+  result: string;
 }
 interface ErrorEventParams {
   category: "error";

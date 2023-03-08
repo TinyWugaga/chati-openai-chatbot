@@ -19,7 +19,7 @@ import {
 export default function useAIConversation() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isProgressing, setIsProgressing] = useState(false);
-  const userId = useRef(`guest_${new Date().valueOf}`);
+  const userId = useRef(`guest_${new Date().valueOf()}`);
 
   const { time, start, stop } = useTimer();
 
@@ -69,6 +69,7 @@ export default function useAIConversation() {
           label: ConversationStatus.SUCCESS,
           conversationId: params.conversationId,
           content: params.content,
+          result: result.content,
         });
       }
       if (error) {
@@ -84,6 +85,7 @@ export default function useAIConversation() {
           label: ConversationStatus.FAILED,
           conversationId: params.conversationId,
           content: params.content,
+          result: `${error.name}: ${error.message}`,
         });
       }
     },

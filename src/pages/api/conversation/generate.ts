@@ -29,6 +29,7 @@ const handleError = async (
     status: 400 | 500 | 504;
   }
 ) => {
+  res.status(status).json({ conversationId: conversationId, error });
   await logger.error("api/conversation/generate", error, {
     conversationId,
     status,
@@ -38,70 +39,70 @@ const handleError = async (
     result: `${error.name}:${error.message}`,
     status: ConversationStatus.FAILED,
   });
-  res.status(status).json({ conversationId: conversationId, error });
 };
 
 export default async function ConversationGenerateAPI(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { conversationId, conversations, userId, role, content } =
-    req.body as RequestParams;
+  if (req.method === "POST") {
+    const { conversationId, conversations, userId, role, content } =
+      req.body as RequestParams;
 
-  const openai = new OpenAI();
+    const openai = new OpenAI();
 
-  try {
-    await conversationLogger.add({
-      conversationId,
-      userId,
-      content,
-      status: ConversationStatus.PROGRESSING,
-    });
-
-    if (!conversationId || !validateContent(content)) {
-      handleError(res, {
+    try {
+      await conversationLogger.add({
         conversationId,
-        error: InvalidContentError(),
-        status: 400,
+        userId,
+        content,
+        status: ConversationStatus.PROGRESSING,
       });
-      return;
-    }
 
-    const messages = generateMessages([...conversations, { role, content }]);
-    const result = await openai.createConversation(messages);
-
-    await logger.log(
-      "api/conversation/generate",
-      "generate conversation success",
-      {
-        conversationId,
-        ...result,
+      if (!conversationId || !validateContent(content)) {
+        handleError(res, {
+          conversationId,
+          error: InvalidContentError(),
+          status: 400,
+        });
+        return;
       }
-    );
-    await conversationLogger.update({
-      conversationId,
-      result: result?.content || "",
-      status: ConversationStatus.SUCCESS,
-    });
 
-    res.status(200).json({ conversationId, result });
-  } catch (error: any) {
-    const errorResponse = error.response;
-    if (errorResponse) {
-      handleError(res, {
+      const messages = generateMessages([...conversations, { role, content }]);
+      const result = await openai.createConversation(messages);
+
+      res.status(200).json({ conversationId, result });
+
+      await logger.log(
+        "api/conversation/generate",
+        "generate conversation success",
+        {
+          conversationId,
+        }
+      );
+      await conversationLogger.update({
         conversationId,
-        error: OpenAIResponseError({
-          ...errorResponse.data,
-          name: `StatusCode: ${errorResponse.status}`,
-        }),
-        status: 500,
+        result: result?.content || "",
+        status: ConversationStatus.SUCCESS,
       });
-    } else {
-      handleError(res, {
-        conversationId,
-        error: RequestServiceError({ error }),
-        status: 500,
-      });
+    } catch (error: any) {
+      const errorResponse = error.response;
+      if (errorResponse) {
+        handleError(res, {
+          conversationId,
+          error: OpenAIResponseError({
+            ...errorResponse.data,
+            message: `StatusCode: ${errorResponse.status}`,
+          }),
+          status: 500,
+        });
+      } else {
+        handleError(res, {
+          conversationId,
+          error: RequestServiceError({ error }),
+          status: 500,
+        });
+      }
     }
   }
 }
