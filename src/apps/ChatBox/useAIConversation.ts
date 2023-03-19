@@ -79,7 +79,7 @@ export default function useAIConversation() {
             role: "assistant",
             content: handleConversationErrorMessage(response.status),
           },
-          status: ConversationStatus.SUCCESS,
+          status: ConversationStatus.FAILED,
         });
         trackConversation("request_conversation", {
           label: ConversationStatus.FAILED,
