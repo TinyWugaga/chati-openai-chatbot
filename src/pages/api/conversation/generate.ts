@@ -81,6 +81,7 @@ export default async function ConversationGenerateAPI(
 
       await conversationLogger.add({
         ...conversationLog,
+        result: result?.content,
         status: ConversationStatus.SUCCESS,
       });
 
