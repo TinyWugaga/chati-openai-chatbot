@@ -21,10 +21,14 @@ const handleError = async (
   res: NextApiResponse,
   {
     conversationId,
+    userId,
+    content,
     error,
     status,
   }: {
     conversationId: string;
+    userId: string;
+    content: string;
     error: Error | any;
     status: 400 | 500 | 504;
   }
@@ -34,8 +38,10 @@ const handleError = async (
       conversationId,
       status,
     }),
-    conversationLogger.update({
+    conversationLogger.add({
       conversationId,
+      userId,
+      content,
       result: `${error.name}:${error.message}`,
       status: ConversationStatus.FAILED,
     }),
@@ -52,18 +58,18 @@ export default async function ConversationGenerateAPI(
       req.body as RequestParams;
 
     const openai = new OpenAI();
+    const conversationLog = {
+      conversationId,
+      userId,
+      content,
+    };
 
     try {
-      await conversationLogger.add({
-        conversationId,
-        userId,
-        content,
-        status: ConversationStatus.PROGRESSING,
-      });
-
       if (!conversationId || !validateContent(content)) {
         handleError(res, {
           conversationId,
+          userId,
+          content,
           error: InvalidContentError(),
           status: 400,
         });
@@ -73,9 +79,9 @@ export default async function ConversationGenerateAPI(
       const messages = generateMessages([...conversations, { role, content }]);
       const result = await openai.createConversation(messages);
 
-      await conversationLogger.update({
-        conversationId,
-        result: result?.content || "",
+      await conversationLogger.add({
+        ...conversationLog,
+        result: result?.content,
         status: ConversationStatus.SUCCESS,
       });
 
@@ -84,7 +90,7 @@ export default async function ConversationGenerateAPI(
       const errorResponse = error.response;
       if (errorResponse) {
         handleError(res, {
-          conversationId,
+          ...conversationLog,
           error: OpenAIResponseError({
             ...errorResponse.data,
             message: `StatusCode: ${errorResponse.status}`,
@@ -93,7 +99,7 @@ export default async function ConversationGenerateAPI(
         });
       } else {
         handleError(res, {
-          conversationId,
+          ...conversationLog,
           error: RequestServiceError({ error }),
           status: 500,
         });

@@ -8,7 +8,7 @@ import {
 } from "@/types";
 import { generateConversation } from "@/services/conversation";
 
-import { trackConversation } from "@/lib/tracker";
+import { trackConversation, trackError } from "@/lib/tracker";
 
 import useTimer from "@/utils/useTimer";
 import {
@@ -79,7 +79,7 @@ export default function useAIConversation() {
             role: "assistant",
             content: handleConversationErrorMessage(response.status),
           },
-          status: ConversationStatus.SUCCESS,
+          status: ConversationStatus.FAILED,
         });
         trackConversation("request_conversation", {
           label: ConversationStatus.FAILED,
@@ -120,7 +120,7 @@ export default function useAIConversation() {
         setIsProgressing(false);
       } catch (error: any) {
         setIsProgressing(false);
-        throw error;
+        trackError(error, { label: "useAIConversation/requestConversation" });
       }
     },
     [fetchGenerateConversation]
